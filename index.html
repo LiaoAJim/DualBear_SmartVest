@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DualBear SmartVest - 智能量化投資大廳</title>
+  <link rel="stylesheet" href="assets/css/hub.css?v=20261125_01">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="theme-dark">
+  <div class="hub-container">
+    <!-- 頂部導航列 -->
+    <header class="hub-header">
+      <div class="brand">
+        <div class="brand-logo">🐻</div>
+        <div class="brand-text">
+          <h1>SmartVest Hub</h1>
+          <p class="subtitle">雙熊智能量化投資大廳 · 獨立策略入口</p>
+        </div>
+      </div>
+      <div class="header-status">
+        <span class="status-badge" id="hub-sync-status">
+          <span class="dot"></span> 脫敏戰情報告連線中
+        </span>
+        <span class="time-badge" id="hub-last-updated">更新中...</span>
+      </div>
+    </header>
+
+    <!-- 市場戰情報告快照條 (由本地脫敏數據驅動) -->
+    <section class="market-ticker-card" id="market-ticker-section">
+      <div class="ticker-header">
+        <div class="ticker-title-wrap">
+          <span class="ticker-title">📡 今日全景戰報摘要 (客觀市場脈動)</span>
+          <span class="ticker-source-tag" id="ticker-data-time">數據時間：--</span>
+        </div>
+        <button class="ticker-toggle-btn" id="btn-toggle-report" type="button" onclick="toggleReportDrawer()">
+          <span class="toggle-icon" id="drawer-toggle-icon">▼</span>
+          <span class="toggle-text" id="drawer-toggle-text">展開完整診斷報告</span>
+        </button>
+      </div>
+
+      <!-- 2排2行 4 大核心監控區塊 (常駐展示) + 可展開之完整報告抽屜 -->
+      <div class="report-drawer collapsed" id="report-drawer">
+        <div class="drawer-grid">
+          <!-- 卡片 1: 台美市場位階與回撤 -->
+          <div class="drawer-card">
+            <div class="drawer-card-title">📌 台美市場位階與回撤</div>
+            <div class="drawer-card-content">
+              <div class="drawer-row">
+                <span class="drawer-label">那斯達克 100</span>
+                <span class="drawer-val" id="detail-ndx-pos">--</span>
+              </div>
+              <div class="drawer-row">
+                <span class="drawer-label">台股加權指數</span>
+                <span class="drawer-val" id="detail-twii-pos">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 卡片 2: 市場估值位階 (P/E) -->
+          <div class="drawer-card">
+            <div class="drawer-card-title">💎 市場估值位階 (P/E)</div>
+            <div class="drawer-card-content">
+              <div class="drawer-row">
+                <span class="drawer-label">那斯達克 (QQQ)</span>
+                <span class="drawer-val val-green" id="detail-qqq-pe">--</span>
+              </div>
+              <div class="drawer-row">
+                <span class="drawer-label">台股大盤 (EWT)</span>
+                <span class="drawer-val val-yellow" id="detail-ewt-pe">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 卡片 3: 籌碼與多空監控 -->
+          <div class="drawer-card">
+            <div class="drawer-card-title">🛡️ 籌碼與多空監控</div>
+            <div class="drawer-card-content">
+              <div class="drawer-row">
+                <span class="drawer-label">微台散戶多空比</span>
+                <span class="drawer-val val-rose" id="detail-retail-chip">--</span>
+              </div>
+              <div class="drawer-row">
+                <span class="drawer-label">大盤融資維持率</span>
+                <span class="drawer-val val-amber" id="detail-margin-chip">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 卡片 4: 恐慌與情緒監控 (VIX / F&G) -->
+          <div class="drawer-card">
+            <div class="drawer-card-title">⚡ 恐慌與情緒監控</div>
+            <div class="drawer-card-content">
+              <div class="drawer-row">
+                <span class="drawer-label">臺指 / 美股 VIX</span>
+                <span class="drawer-val val-rose" id="detail-vix-pair">--</span>
+              </div>
+              <div class="drawer-row">
+                <span class="drawer-label">CNN 恐懼指數</span>
+                <span class="drawer-val val-amber" id="detail-cnn-fng">--</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 完整診斷日誌文字展開區 -->
+        <div class="full-report-box" id="detail-full-report-box">
+          <div class="full-report-header">
+            <span>📜 完整診斷報告文字 (1:1 對齊 LINE 每日推播)</span>
+          </div>
+          <pre class="full-report-text" id="detail-full-report">載入中...</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 策略 APP 網格展示區 (放上即上架) -->
+    <main class="apps-section">
+      <div class="section-title-wrap">
+        <div>
+          <h2>🚀 量化獨立策略與診斷 APP</h2>
+          <span class="section-desc">點擊卡片即可獨立開啟各策略與壓力測試系統</span>
+        </div>
+        <div class="section-tools">
+          <button type="button" class="btn-reset-order" id="btn-reset-app-order" onclick="resetAppsOrder()" title="重設卡片為預設排列順序">↺ 重設順序</button>
+        </div>
+      </div>
+
+      <div class="apps-grid" id="apps-grid">
+        <!-- APP 1: 蒙地卡羅全景圖 (多標的對比 + 5,000 次平行宇宙深度診斷二合一) -->
+        <a class="app-card" id="app-card-monte-carlo" data-app-id="monte_carlo" href="reports/multi_ticker_comparison.html" target="_blank" rel="noopener">
+          <div class="app-card-top">
+            <span class="app-icon">🎲</span>
+            <div class="app-card-actions">
+              <button type="button" class="card-nav-btn btn-move-left" title="向前移動" onclick="moveAppCard(event, 'monte_carlo', -1)">◀</button>
+              <button type="button" class="card-nav-btn btn-move-right" title="向後移動" onclick="moveAppCard(event, 'monte_carlo', 1)">▶</button>
+              <span class="app-tag tag-ready">即開即用</span>
+            </div>
+          </div>
+          <div class="app-card-body">
+            <h3 class="app-name">蒙地卡羅多標的極限壓力測試</h3>
+            <p class="app-desc">8 檔核心標的橫向全景對比、5,000 次平行宇宙抽樣推演、最大回撤谷底與 50% 腰斬斷頭防線深度度量。</p>
+          </div>
+          <div class="app-card-footer">
+            <span class="tech-badge">Bootstrap 抽樣</span>
+            <span class="app-launch-btn">進入 APP →</span>
+          </div>
+        </a>
+
+        <!-- APP 2: 台美股去估值全景圖 -->
+        <a class="app-card" id="app-card-macro-valuation" data-app-id="macro_valuation" href="reports/macro_valuation_chart.html" target="_blank" rel="noopener">
+          <div class="app-card-top">
+            <span class="app-icon">📊</span>
+            <div class="app-card-actions">
+              <button type="button" class="card-nav-btn btn-move-left" title="向前移動" onclick="moveAppCard(event, 'macro_valuation', -1)">◀</button>
+              <button type="button" class="card-nav-btn btn-move-right" title="向後移動" onclick="moveAppCard(event, 'macro_valuation', 1)">▶</button>
+              <span class="app-tag tag-ready">即開即用</span>
+            </div>
+          </div>
+          <div class="app-card-body">
+            <h3 class="app-name">台美股去估值進度偵察</h3>
+            <p class="app-desc">歷史本益比位階評估、融資斷頭警戒線監控與宏觀流動性收縮互動全景圖。</p>
+          </div>
+          <div class="app-card-footer">
+            <span class="tech-badge">宏觀指標</span>
+            <span class="app-launch-btn">進入 APP →</span>
+          </div>
+        </a>
+
+        <!-- APP 3: ZenGrid 2X 網格交易系統 -->
+        <div class="app-card disabled" id="app-card-zengrid-2x" data-app-id="zengrid_2x">
+          <div class="app-card-top">
+            <span class="app-icon">⚡</span>
+            <div class="app-card-actions">
+              <button type="button" class="card-nav-btn btn-move-left" title="向前移動" onclick="moveAppCard(event, 'zengrid_2x', -1)">◀</button>
+              <button type="button" class="card-nav-btn btn-move-right" title="向後移動" onclick="moveAppCard(event, 'zengrid_2x', 1)">▶</button>
+              <span class="app-tag tag-wip">本機專用</span>
+            </div>
+          </div>
+          <div class="app-card-body">
+            <h3 class="app-name">ZenGrid 2X：深淵熔爐</h3>
+            <p class="app-desc">槓桿 ETF 雙向極限網格回測與自動交易特工，針對震盪市自動高拋低吸。</p>
+          </div>
+          <div class="app-card-footer">
+            <span class="tech-badge">網格交易</span>
+            <span class="app-launch-btn">Launcher [2] 啟動</span>
+          </div>
+        </div>
+
+        <!-- APP 4: Leverage Monitor 槓桿監控 -->
+        <div class="app-card disabled" id="app-card-leverage-monitor" data-app-id="leverage_monitor">
+          <div class="app-card-top">
+            <span class="app-icon">📈</span>
+            <div class="app-card-actions">
+              <button type="button" class="card-nav-btn btn-move-left" title="向前移動" onclick="moveAppCard(event, 'leverage_monitor', -1)">◀</button>
+              <button type="button" class="card-nav-btn btn-move-right" title="向後移動" onclick="moveAppCard(event, 'leverage_monitor', 1)">▶</button>
+              <span class="app-tag tag-wip">本機專用</span>
+            </div>
+          </div>
+          <div class="app-card-body">
+            <h3 class="app-name">Leverage-Monitor 槓桿面板</h3>
+            <p class="app-desc">美台槓桿 ETF 每日動態追蹤、正逆價差溢價率與持倉曝險換算。</p>
+          </div>
+          <div class="app-card-footer">
+            <span class="tech-badge">ETF 監控</span>
+            <span class="app-launch-btn">Launcher [3] 啟動</span>
+          </div>
+        </div>
+        <!-- APP 5: 股票/ETF 定期定額 (DCA) 與策略回測計算機 (YP-Finance 10大指標對齊) -->
+        <a class="app-card" id="app-card-dca-lab" data-app-id="dca_lab" href="reports/stock_dca_dashboard.html" target="_blank" rel="noopener">
+          <div class="app-card-top">
+            <span class="app-icon">🐻</span>
+            <div class="app-card-actions">
+              <button type="button" class="card-nav-btn btn-move-left" title="向前移動" onclick="moveAppCard(event, 'dca_lab', -1)">◀</button>
+              <button type="button" class="card-nav-btn btn-move-right" title="向後移動" onclick="moveAppCard(event, 'dca_lab', 1)">▶</button>
+              <span class="app-tag tag-ready">即開即用</span>
+            </div>
+          </div>
+          <div class="app-card-body">
+            <h3 class="app-name">股票/ETF 定期定額 (DCA) 回測</h3>
+            <p class="app-desc">1:1 對標 YP-Finance 10 大標準數據指標，內建 Split Guard 股票分割自癒與單筆 vs 定期定額多標的同台對決。</p>
+          </div>
+          <div class="app-card-footer">
+            <span class="tech-badge">Split Guard 護甲</span>
+            <span class="app-launch-btn">進入 APP →</span>
+          </div>
+        </a>
+
+        <!-- APP 6: DualBear ETF DrawdownLab - 台股高股息 ETF 與 0050 同期含息報酬與抗跌/進攻雙模評估 -->
+        <a class="app-card" id="app-card-drawdown-lab" data-app-id="drawdown_lab" href="reports/etf_comparison.html" target="_blank" rel="noopener">
+          <div class="app-card-top">
+            <span class="app-icon">🛡️</span>
+            <div class="app-card-actions">
+              <button type="button" class="card-nav-btn btn-move-left" title="向前移動" onclick="moveAppCard(event, 'drawdown_lab', -1)">◀</button>
+              <button type="button" class="card-nav-btn btn-move-right" title="向後移動" onclick="moveAppCard(event, 'drawdown_lab', 1)">▶</button>
+              <span class="app-tag tag-ready">即開即用</span>
+            </div>
+          </div>
+          <div class="app-card-body">
+            <h3 class="app-name">ETF 跌幅抗跌與漲幅進攻評估</h3>
+            <p class="app-desc">五大高股息 ETF (0056/00878/00919/00918/00929) 與 0050 同期含息總報酬比較，支援 0050 報酬自動感應開機與一鍵雙模切換。</p>
+          </div>
+          <div class="app-card-footer">
+            <span class="tech-badge">含息總報酬二合一</span>
+            <span class="app-launch-btn">進入 APP →</span>
+          </div>
+        </a>
+      </div>
+    </main>
+
+    <!-- 底部說明 -->
+    <footer class="hub-footer">
+      <p>DualBear SmartVest Architecture · 零依賴、純靜態、物理級別脫敏安全設計</p>
+      <p class="footer-sub">敏感 API Key 與個人資產 100% 留存本地電腦，雲端僅承載客觀市場戰報。</p>
+    </footer>
+  </div>
+
+  <script src="assets/js/hub.js?v=20261126_02_pe_fix"></script>
+</body>
+</html>

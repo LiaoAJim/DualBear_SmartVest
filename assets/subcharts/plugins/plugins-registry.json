@@ -1,0 +1,52 @@
+[
+  {
+    "id": "volume",
+    "name": "成交量與均量線",
+    "category": "基礎量價",
+    "icon": "📊",
+    "desc": "成交量柱狀圖，支援 5/20/60/120 N 日自訂均量線",
+    "defaultHeight": 120,
+    "defaultEnabled": true,
+    "file": "plugin-volume.js"
+  },
+  {
+    "id": "amount",
+    "name": "成交金額副圖",
+    "category": "基礎量價",
+    "icon": "💰",
+    "desc": "每日真實成交值 (收盤價 × 成交量)，支援 5/20 均額線",
+    "defaultHeight": 110,
+    "defaultEnabled": true,
+    "file": "plugin-amount.js"
+  },
+  {
+    "id": "leverage",
+    "name": "正2槓桿效率比",
+    "category": "量化指標",
+    "icon": "⚡",
+    "desc": "正2/原型波動槓桿比率、10MA 乖離通道與 4 色做頭/守護延伸散點",
+    "defaultHeight": 160,
+    "defaultEnabled": true,
+    "file": "plugin-leverage.js"
+  },
+  {
+    "id": "bias5y",
+    "name": "長週期 5 年線乖離率與資金配置階梯",
+    "category": "長線戰略",
+    "icon": "🏛️",
+    "desc": "5 年線基準軌道、2 年線試單 20%、兩線中線 50%、建議累積資金階梯",
+    "defaultHeight": 170,
+    "defaultEnabled": true,
+    "file": "plugin-bias5y.js"
+  },
+  {
+    "id": "keynes",
+    "name": "凱因斯群眾心理情緒副圖",
+    "category": "情緒循環",
+    "icon": "🧠",
+    "desc": "0 軸紅綠山丘情緒擴張/壓制、-10.00 長線價值線",
+    "defaultHeight": 130,
+    "defaultEnabled": false,
+    "file": "plugin-keynes.js"
+  }
+]

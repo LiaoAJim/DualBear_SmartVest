@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DualBear 台美股總體經濟、美債與去估值戰略全景圖</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body {
+      background-color: #0b0f19;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif;
+      margin: 0;
+      padding: 16px 24px;
+    }
+    .control-panel {
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+    .control-row-1 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 10px;
+    }
+    .control-row-2 {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .checkbox-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      font-size: 13.5px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .checkbox-item input[type="checkbox"] {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      border-radius: 4px;
+      accent-color: #0284c7;
+    }
+    /* 線條圖樣指示器 */
+    .line-indicator {
+      display: inline-block;
+      width: 24px;
+      height: 0;
+      vertical-align: middle;
+      margin: 0 2px;
+    }
+    .ind-solid { border-top: 3px solid; }
+    .ind-dash { border-top: 3px dashed; }
+    .ind-dot { border-top: 3px dotted; }
+    .ind-dashdot { border-top: 3px dashed; border-bottom: 1px solid; height: 3px; }
+    
+    .tag-nasdaq { color: #38bdf8; }
+    .tag-taiex { color: #4ade80; }
+    .tag-us10y { color: #f43f5e; }
+    .tag-us30y { color: #c084fc; }
+    .tag-fed { color: #fb923c; }
+    .tag-nasey { color: #67e8f9; }
+    .tag-twey { color: #86efac; }
+    .tag-userp { color: #e879f9; }
+    .tag-twerp { color: #2dd4bf; }
+
+    /* 快捷按鈕與選中高亮改色樣式 */
+    .btn-quick {
+      font-size: 13px;
+      padding: 5px 13px;
+      border-radius: 6px;
+      background-color: #283548;
+      color: #cbd5e1;
+      border: 1px solid #475569;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.15s ease-in-out;
+    }
+    .btn-quick:hover {
+      background-color: #3b4c64;
+      color: #ffffff;
+      border-color: #64748b;
+    }
+    .btn-quick.active {
+      background-color: #0284c7 !important;
+      color: #ffffff !important;
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+
+    .chart-container {
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      overflow: hidden;
+      background-color: #111827;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+      margin-bottom: 24px;
+    }
+
+    /* 圖表下方宏觀量化深度解析常駐卡片 */
+    .macro-guide-card {
+      background-color: #111827;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 8px;
+      margin-bottom: 32px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+    }
+    .macro-guide-header {
+      background-color: #1e293b;
+      border-bottom: 1px solid #334155;
+      padding: 16px 24px;
+    }
+
+    .diagnosis-grid {
+      display: grid !important;
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      gap: 14px;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+    .diag-card {
+      background-color: #161f30;
+      border: 1px solid #283548;
+      border-radius: 10px;
+      padding: 14px 16px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+    }
+    @media (max-width: 640px) {
+      .diagnosis-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+    .diag-header {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #283548;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .diag-item {
+      font-size: 13.5px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .diag-label { color: #94a3b8; }
+    .diag-val { font-weight: 600; color: #f1f5f9; }
+    .diag-badge {
+      display: block;
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      line-height: 1.4;
+    }
+    .badge-danger {
+      color: #f87171;
+      border-color: #7f1d1d;
+      background-color: rgba(127, 29, 29, 0.2);
+    }
+    .badge-success {
+      color: #4ade80;
+      border-color: #14532d;
+      background-color: rgba(20, 83, 45, 0.2);
+    }
+    .badge-neutral {
+      color: #38bdf8;
+      border-color: #0369a1;
+      background-color: rgba(3, 105, 161, 0.2);
+    }
+    .modal-content.dark-modal {
+      background-color: #0f172a;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+    }
+    .dark-modal .modal-header {
+      border-bottom: 1px solid #1e293b;
+      background-color: #1e293b;
+      border-top-left-radius: 11px;
+      border-top-right-radius: 11px;
+    }
+    .dark-modal .modal-footer {
+      border-top: 1px solid #1e293b;
+      background-color: #1e293b;
+      border-bottom-left-radius: 11px;
+      border-bottom-right-radius: 11px;
+    }
+    .formula-box {
+      background-color: #020617;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 14px 0;
+      font-family: Consolas, monospace;
+      color: #38bdf8;
+      font-size: 14px;
+    }
+    .point-card {
+      background-color: #1e293b;
+      border-left: 4px solid #0284c7;
+      border-radius: 4px 8px 8px 4px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+    }
+    .point-title {
+      font-weight: 700;
+      color: #f8fafc;
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+    .point-desc {
+      font-size: 13.5px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin: 0;
+    }
+  
+    .main-header {
+      padding: 4px 0 16px 0;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .main-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: -0.5px;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 12.5px;
+      color: #94a3b8;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+    .header-badge b {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 主視窗頂部主標題 -->
+  <div class="main-header">
+    <h1 class="main-title">🐻 DualBear 台美股總體經濟、美債與去估值戰略全景圖</h1>
+    <div class="header-meta">
+      <span class="header-badge">📅 行情基準日: <b>2026-11-26</b></span>
+      <span class="header-badge">🕒 報表生成時間: <b>2026-11-27 18:17:20</b></span>
+    </div>
+  </div>
+
+  <!-- 戰略情報與去估值診斷卡片區 -->
+  <div class="diagnosis-grid">
+    <!-- 卡片 1: 全球無風險利率定價核心 -->
+    <div class="diag-card">
+      <div class="diag-header">
+        <span class="text-danger">🏛️ 全球無風險利率 (美國公債)</span>
+        <span style="font-size:12px; color:#94a3b8;">2026-11-26</span>
+      </div>
+      <div class="diag-item">
+        <span class="diag-label">美債 10 年期殖利率 (^TNX):</span>
+        <span class="diag-val">4.85%</span>
+      </div>
+      <div class="diag-item">
+        <span class="diag-label">美債 30 年期殖利率 (^TYX):</span>
+        <span class="diag-val">5.24%</span>
+      </div>
+      <div class="diag-item">
+        <span class="diag-label">聯準會 / 3 月期國債利率 (^IRX):</span>
+        <span class="diag-val">4.16%</span>
+      </div>
+      <div class="diag-item">
+        <span class="diag-label">台美 10Y 公債利差:</span>
+        <span class="diag-val text-warning">2.84%</span>
+      </div>
+      <div class="diag-badge badge-neutral">
+        💡 <strong>定價之錨</strong>：10Y 美債殖利率高於 4.8%，形成全球無風險回報基準，促使資金重估股市估值。
+      </div>
+    </div>
+
+    <!-- 卡片 2: 美股科技去估值監測 -->
+    <div class="diag-card">
+      <div class="diag-header">
+        <span class="text-info">🇺🇸 美股科技大盤 (Nasdaq)</span>
+        <span style="font-size:12px; color:#94a3b8;">2026-11-26</span>
+      </div>
+      <div class="diag-item">
+        <span class="diag-label">那指本益比 (P/E Ratio):</span>
+        <span class="diag-val">25.8 倍</span>
+      </div>
+      <div class="diag-item">
+        <span class="diag-label">那指盈餘殖利率 (1/PE):</span>
+        <span class="diag-val text-info">3.88%</span>
+      </div>
+      <div class="diag-item">
+        <span class="diag-label">美股對美債 10Y ERP 溢酬:</span>
+        <span class="diag-val text-danger">-0.97%</span>
+      </div>
+      <div class="diag-badge badge-danger">
+        ⚠️ <strong>去估值狀態</strong>：【溢價壓縮・去估值進行中】(股票風險補償偏低，科技股修正)
+      </div>
+    </div>
+
+    <!-- 卡片 3: 台股加權與跨國配美債 -->
+    <div class="diag-card">
+      <div class="diag-header">
+        <span class="text-success">🇹🇼 台股加權 (TAIEX) 與配美債</span>
+        <span style="font-size:12px; color:#94a3b8;">2026-11-26</span>
+      </div>
+      <div class="diag-item">
+        <span class="diag-label">台股加權本益比 (PE):</span>
+        <span class="diag-val">25.0 倍</span>
+      </div>
+      <div class="diag-item">
+        <span class="diag-label">台股盈餘殖利率 (1/PE):</span>
+        <span class="diag-val text-success">4.0%</span>
+      </div>
+      <div class="diag-item">
+        <span class="diag-label">台股獲利對美債 10Y ERP:</span>
+        <span class="diag-val text-danger">-0.85%</span>
+      </div>
+      <div class="diag-badge badge-danger">
+        🎯 <strong>配置建議</strong>：【強烈建議配美債】(台股獲利率低於無風險美債，外資必提款賣股)
+      </div>
+    </div>
+
+    <!-- 卡片 4: 籌碼與融資斷頭風暴 (對齊全域真實維持率) -->
+    <div class="diag-card">
+      <div class="diag-header">
+        <span class="text-warning">⚡ 台股大盤融資斷頭監測</span>
+        <span style="font-size:12px; color:#94a3b8;">2026-11-26</span>
+      </div>
+      <div class="diag-item">
+        <span class="diag-label">全市場融資餘額:</span>
+        <span class="diag-val">4,344.8 億元</span>
+      </div>
+      <div class="diag-item">
+        <span class="diag-label">最新單日增減:</span>
+        <span class="diag-val text-info">+3.5 億元</span>
+      </div>
+      <div class="diag-item">
+        <span class="diag-label">大盤融資維持率:</span>
+        <span class="diag-val text-success fw-bold" style="font-size:15px; color:#4ade80;">159.7% (安全水位)</span>
+      </div>
+      <div class="diag-badge badge-success">
+        ⚖️ <strong>籌碼診斷</strong>：⚖️【融資籌碼平穩】(未出現極端斷頭現象)
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 控制列：第1行放按鈕，第2行放線條勾選 -->
+  <div class="control-panel">
+    <!-- 第 1 行：左上角快捷按鈕群 + 最右側純圖示說明按鈕 -->
+    <div class="control-row-1">
+      <span class="panel-title">🎯 快捷視角：</span>
+      <button class="btn-quick active" id="btn_all" onclick="setPreset([true, true, true, true, true, true, true, true, true], this)">全選</button>
+      <button class="btn-quick" id="btn_ey_bond" onclick="setPreset([false, false, true, false, false, true, true, false, false], this)">殖利率 vs 美債</button>
+      <button class="btn-quick" id="btn_erp" onclick="setPreset([false, false, false, false, false, false, false, true, true], this)">僅看雙市場ERP</button>
+      <button class="btn-quick" id="btn_stocks" onclick="setPreset([true, true, false, false, false, false, false, false, false], this)">僅看雙股市</button>
+      <button class="btn-quick" id="btn_bonds" onclick="setPreset([false, false, true, true, true, false, false, false, false], this)">僅看美債利率</button>
+      <button class="btn-quick" id="btn_clear" onclick="setPreset([false, false, false, false, false, false, false, false, false], this)">全清</button>
+    </div>
+
+    <!-- 第 2 行：線條獨立勾選（文字旁附帶對應線型與顏色預覽） -->
+    <div class="control-row-2">
+      <span class="panel-title">📊 線條勾選：</span>
+
+      <label class="checkbox-item tag-nasdaq">
+        <input type="checkbox" id="chk_trace_0" checked onchange="toggleTrace(0, this.checked)">
+        <span class="line-indicator ind-solid" style="border-color:#38bdf8;"></span>
+        🇺🇸 那指大盤
+      </label>
+
+      <label class="checkbox-item tag-taiex">
+        <input type="checkbox" id="chk_trace_1" checked onchange="toggleTrace(1, this.checked)">
+        <span class="line-indicator ind-solid" style="border-color:#4ade80;"></span>
+        🇹🇼 台股加權
+      </label>
+
+      <label class="checkbox-item tag-us10y">
+        <input type="checkbox" id="chk_trace_2" checked onchange="toggleTrace(2, this.checked)">
+        <span class="line-indicator ind-dash" style="border-color:#f43f5e;"></span>
+        🏛️ 美債10Y
+      </label>
+
+      <label class="checkbox-item tag-us30y">
+        <input type="checkbox" id="chk_trace_3" checked onchange="toggleTrace(3, this.checked)">
+        <span class="line-indicator ind-dot" style="border-color:#c084fc;"></span>
+        🗽 美債30Y
+      </label>
+
+      <label class="checkbox-item tag-fed">
+        <input type="checkbox" id="chk_trace_4" checked onchange="toggleTrace(4, this.checked)">
+        <span class="line-indicator ind-solid" style="border-color:#fb923c; border-top-width:4px;"></span>
+        🏦 聯準會 / 3 月期國債利率
+      </label>
+
+      <label class="checkbox-item tag-nasey">
+        <input type="checkbox" id="chk_trace_5" checked onchange="toggleTrace(5, this.checked)">
+        <span class="line-indicator ind-dashdot" style="border-color:#67e8f9;"></span>
+        📊 那指盈餘殖利率(1/PE)
+      </label>
+
+      <label class="checkbox-item tag-twey">
+        <input type="checkbox" id="chk_trace_6" checked onchange="toggleTrace(6, this.checked)">
+        <span class="line-indicator ind-dashdot" style="border-color:#86efac;"></span>
+        📈 台股盈餘殖利率(1/PE)
+      </label>
+
+      <label class="checkbox-item tag-userp">
+        <input type="checkbox" id="chk_trace_7" checked onchange="toggleTrace(7, this.checked)">
+        <span class="line-indicator ind-solid" style="border-color:#e879f9; border-top-width:4px;"></span>
+        💎 美股10Y ERP
+      </label>
+
+      <label class="checkbox-item tag-twerp">
+        <input type="checkbox" id="chk_trace_8" checked onchange="toggleTrace(8, this.checked)">
+        <span class="line-indicator ind-solid" style="border-color:#2dd4bf; border-top-width:4px;"></span>
+        ⚖️ 台股10Y ERP
+      </label>
+    </div>
+  </div>
+
+  <!-- 圖表畫布 -->
+  <div class="chart-container">
+    <div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.5.0.min.js" integrity="sha256-fHbNLP+GlIXN+efbQec78UkemUz3NJp7UmfGxC1tNxs=" crossorigin="anonymous"></script>                <div id="ab4bd29e-9a53-4e6c-877d-7b4b77af34b8" class="plotly-graph-div" style="height:720px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("ab4bd29e-9a53-4e6c-877d-7b4b77af34b8")) {                    Plotly.newPlot(                        "ab4bd29e-9a53-4e6c-877d-7b4b77af34b8",                        [{"hovertemplate":"🇺🇸 那指大盤: %{y:,.1f} 點\u003cextra\u003e\u003c\u002fextra\u003e","line":{"color":"#38bdf8","width":2.2},"name":"🇺🇸 那斯達克 (Nasdaq)","x":["2026-06-01T00:00:00","2026-06-02T00:00:00","2026-06-03T00:00:00","2026-06-04T00:00:00","2026-06-05T00:00:00","2026-06-08T00:00:00","2026-06-09T00:00:00","2026-06-10T00:00:00","2026-06-11T00:00:00","2026-06-12T00:00:00","2026-06-15T00:00:00","2026-06-16T00:00:00","2026-06-17T00:00:00","2026-06-18T00:00:00","2026-06-22T00:00:00","2026-06-23T00:00:00","2026-06-24T00:00:00","2026-06-25T00:00:00","2026-06-26T00:00:00","2026-06-29T00:00:00","2026-06-30T00:00:00","2026-07-01T00:00:00","2026-07-02T00:00:00","2026-07-03T00:00:00","2026-07-06T00:00:00","2026-07-07T00:00:00","2026-07-08T00:00:00","2026-07-09T00:00:00","2026-07-10T00:00:00","2026-07-13T00:00:00","2026-07-14T00:00:00","2026-07-15T00:00:00","2026-07-16T00:00:00","2026-07-17T00:00:00","2026-07-20T00:00:00","2026-07-21T00:00:00","2026-07-22T00:00:00","2026-07-23T00:00:00","2026-07-24T00:00:00","2026-07-27T00:00:00","2026-07-28T00:00:00","2026-07-29T00:00:00","2026-07-30T00:00:00","2026-07-31T00:00:00","2026-08-03T00:00:00","2026-08-04T00:00:00","2026-08-05T00:00:00","2026-08-06T00:00:00","2026-08-07T00:00:00","2026-08-10T00:00:00","2026-08-11T00:00:00","2026-08-12T00:00:00","2026-08-13T00:00:00","2026-08-14T00:00:00","2026-08-17T00:00:00","2026-08-18T00:00:00","2026-08-19T00:00:00","2026-08-20T00:00:00","2026-08-21T00:00:00","2026-08-24T00:00:00","2026-08-25T00:00:00","2026-08-26T00:00:00","2026-08-27T00:00:00","2026-08-28T00:00:00","2026-08-31T00:00:00","2026-09-01T00:00:00","2026-09-02T00:00:00","2026-09-03T00:00:00","2026-09-04T00:00:00","2026-09-07T00:00:00","2026-09-08T00:00:00","2026-09-09T00:00:00","2026-09-10T00:00:00","2026-09-11T00:00:00","2026-09-14T00:00:00","2026-09-15T00:00:00","2026-09-16T00:00:00","2026-09-17T00:00:00","2026-09-18T00:00:00","2026-09-21T00:00:00","2026-09-22T00:00:00","2026-09-23T00:00:00","2026-09-24T00:00:00","2026-09-25T00:00:00","2026-09-28T00:00:00","2026-09-29T00:00:00","2026-09-30T00:00:00","2026-10-01T00:00:00","2026-10-02T00:00:00","2026-10-05T00:00:00","2026-10-06T00:00:00","2026-10-07T00:00:00","2026-10-08T00:00:00","2026-10-09T00:00:00","2026-10-12T00:00:00","2026-10-13T00:00:00","2026-10-14T00:00:00","2026-10-15T00:00:00","2026-10-16T00:00:00","2026-10-19T00:00:00","2026-10-20T00:00:00","2026-10-21T00:00:00","2026-10-22T00:00:00","2026-10-23T00:00:00","2026-10-26T00:00:00","2026-10-27T00:00:00","2026-10-28T00:00:00","2026-10-29T00:00:00","2026-10-30T00:00:00","2026-11-02T00:00:00","2026-11-03T00:00:00","2026-11-04T00:00:00","2026-11-05T00:00:00","2026-11-06T00:00:00","2026-11-09T00:00:00","2026-11-10T00:00:00","2026-11-11T00:00:00","2026-11-12T00:00:00","2026-11-13T00:00:00","2026-11-16T00:00:00","2026-11-17T00:00:00","2026-11-18T00:00:00","2026-11-19T00:00:00","2026-11-20T00:00:00","2026-11-23T00:00:00","2026-11-24T00:00:00","2026-11-25T00:00:00","2026-11-26T00:00:00"],"y":{"dtype":"f8","bdata":"AAAA4LNz2kAAAACgeXXaQAAAAMB+OdpAAAAAgL0z2kAAAACAWxvZQAAAAEBqUtlAAAAAgLQT2UAAAAAAYJTYQAAAAEBqNNlAAAAAwDVI2UAAAAAg\u002fA7aQAAAAMAVwtlAAAAAQGpp2UAAAACAe+XZQAAAAGCmjdlAAAAAgML82EAAAAAAKeHYQAAAAGCmw9hAAAAAoGe02EAAAAAACTfZQAAAACBumdlAAAAA4AFu2UAAAADgKjrZQAAAAOAqOtlAAAAAQEqC2UAAAAAgrDbZQAAAAKCpQ9lAAAAAALmX2UAAAAAAZ6rZQAAAAIBLRNlAAAAAoMB+2UAAAADATqfZQAAAAMB8RtlAAAAAYA\u002fs2EAAAACABOnYQAAAAIBNO9lAAAAAoLkW2UAAAAAgbIzYQAAAAID0Y9hAAAAAIAVZ2EAAAABAOkvYQAAAACC83tdAAAAAgIuI2EAAAABgdsfYQAAAAKB5TtlAAAAAYD\u002f22UAAAAAg3L7ZQAAAAGAWu9lAAAAAoKcQ2kAAAAAAV\u002fvZQAAAAMBc09lAAAAAYB\u002f32UAAAADgwSzaQAAAAEBKGtpAAAAAQDoF2kAAAACAbazZQAAAAMDFttlAAAAA4Mp02UAAAACAHZHZQAAAACAMX9lAAAAAQNOJ2UAAAADAjITZQAAAAGBW69lAAAAA4JrI2UAAAAAAucDZQAAAAEDxfNlAAAAAIHWa2UAAAADgA\u002fbZQAAAAGC\u002f4tlAAAAAYL\u002fi2UAAAABAWs3ZQAAAAMBVo9lAAAAAIG542UAAAACAQrfZQAAAAECaktlAAAAAgGRf2UAAAACAm17ZQAAAAECTzNlAAAAAgKLm2UAAAADAhXzaQAAAAOARm9pAAAAAgAJO2kAAAACg107aQAAAACAub9pAAAAAYBgx2kAAAACAYivaQAAAAOBDO9pAAAAAYOY92kAAAAAAt43aQAAAAOBT1dpAAAAAgPLz2kAAAAAgrOTaQAAAAMBVjtpAAAAA4Iq52kAAAACgeZvaQAAAAGAYkdpAAAAAoDcR2kAAAADgQRbaQAAAAOABh9lAAAAAALnP2UAAAACANM7ZQAAAAAC3E9pAAAAAADdm2UAAAADA1VjZQAAAAGBYjtlAAAAA4HPb2UAAAABgdu3ZQAAAACAuktlAAAAAAEDX2EAAAADgE5PYQAAAAKAAx9hAAAAAoCAi2UAAAAAAwL7XQAAAAIDbANhAAAAAAEmp2EAAAACgd3rYQAAAACCM3thAAAAAwIXF2EAAAABAEYzYQAAAAKBw79dAAAAAYBjC10AAAABgeNvXQAAAAMDMUddAAAAAwG4W1kAAAADgY4bXQAAAAIBiLddAAAAAQHMI10AAAABAcwjXQA=="},"type":"scatter","xaxis":"x","yaxis":"y"},{"hovertemplate":"🇹🇼 台股加權: %{y:,.1f} 點\u003cextra\u003e\u003c\u002fextra\u003e","line":{"color":"#4ade80","width":2.2},"name":"🇹🇼 台股加權 (TAIEX)","x":["2026-06-01T00:00:00","2026-06-02T00:00:00","2026-06-03T00:00:00","2026-06-04T00:00:00","2026-06-05T00:00:00","2026-06-08T00:00:00","2026-06-09T00:00:00","2026-06-10T00:00:00","2026-06-11T00:00:00","2026-06-12T00:00:00","2026-06-15T00:00:00","2026-06-16T00:00:00","2026-06-17T00:00:00","2026-06-18T00:00:00","2026-06-22T00:00:00","2026-06-23T00:00:00","2026-06-24T00:00:00","2026-06-25T00:00:00","2026-06-26T00:00:00","2026-06-29T00:00:00","2026-06-30T00:00:00","2026-07-01T00:00:00","2026-07-02T00:00:00","2026-07-03T00:00:00","2026-07-06T00:00:00","2026-07-07T00:00:00","2026-07-08T00:00:00","2026-07-09T00:00:00","2026-07-10T00:00:00","2026-07-13T00:00:00","2026-07-14T00:00:00","2026-07-15T00:00:00","2026-07-16T00:00:00","2026-07-17T00:00:00","2026-07-20T00:00:00","2026-07-21T00:00:00","2026-07-22T00:00:00","2026-07-23T00:00:00","2026-07-24T00:00:00","2026-07-27T00:00:00","2026-07-28T00:00:00","2026-07-29T00:00:00","2026-07-30T00:00:00","2026-07-31T00:00:00","2026-08-03T00:00:00","2026-08-04T00:00:00","2026-08-05T00:00:00","2026-08-06T00:00:00","2026-08-07T00:00:00","2026-08-10T00:00:00","2026-08-11T00:00:00","2026-08-12T00:00:00","2026-08-13T00:00:00","2026-08-14T00:00:00","2026-08-17T00:00:00","2026-08-18T00:00:00","2026-08-19T00:00:00","2026-08-20T00:00:00","2026-08-21T00:00:00","2026-08-24T00:00:00","2026-08-25T00:00:00","2026-08-26T00:00:00","2026-08-27T00:00:00","2026-08-28T00:00:00","2026-08-31T00:00:00","2026-09-01T00:00:00","2026-09-02T00:00:00","2026-09-03T00:00:00","2026-09-04T00:00:00","2026-09-07T00:00:00","2026-09-08T00:00:00","2026-09-09T00:00:00","2026-09-10T00:00:00","2026-09-11T00:00:00","2026-09-14T00:00:00","2026-09-15T00:00:00","2026-09-16T00:00:00","2026-09-17T00:00:00","2026-09-18T00:00:00","2026-09-21T00:00:00","2026-09-22T00:00:00","2026-09-23T00:00:00","2026-09-24T00:00:00","2026-09-25T00:00:00","2026-09-28T00:00:00","2026-09-29T00:00:00","2026-09-30T00:00:00","2026-10-01T00:00:00","2026-10-02T00:00:00","2026-10-05T00:00:00","2026-10-06T00:00:00","2026-10-07T00:00:00","2026-10-08T00:00:00","2026-10-09T00:00:00","2026-10-12T00:00:00","2026-10-13T00:00:00","2026-10-14T00:00:00","2026-10-15T00:00:00","2026-10-16T00:00:00","2026-10-19T00:00:00","2026-10-20T00:00:00","2026-10-21T00:00:00","2026-10-22T00:00:00","2026-10-23T00:00:00","2026-10-26T00:00:00","2026-10-27T00:00:00","2026-10-28T00:00:00","2026-10-29T00:00:00","2026-10-30T00:00:00","2026-11-02T00:00:00","2026-11-03T00:00:00","2026-11-04T00:00:00","2026-11-05T00:00:00","2026-11-06T00:00:00","2026-11-09T00:00:00","2026-11-10T00:00:00","2026-11-11T00:00:00","2026-11-12T00:00:00","2026-11-13T00:00:00","2026-11-16T00:00:00","2026-11-17T00:00:00","2026-11-18T00:00:00","2026-11-19T00:00:00","2026-11-20T00:00:00","2026-11-23T00:00:00","2026-11-24T00:00:00","2026-11-25T00:00:00","2026-11-26T00:00:00"],"y":{"dtype":"f8","bdata":"AAAAID0j5kAAAADgqT7mQAAAACBlr+ZAAAAAwK5N5kAAAAAg3gHmQAAAAADZPeVAAAAAIA7U5UAAAABAMRvlQAAAAMCuEeVAAAAAQCGR5UAAAACgnyrmQAAAACAmXuZAAAAAgKxm5kAAAABgJrDmQAAAAGCwT+dAAAAAwJT\u002f5kAAAABAc3vmQAAAAGDoleZAAAAAYHjD5UAAAADA\u002fPjlQAAAACC9heZAAAAAoF\u002f15kAAAAAgBdPmQAAAAOCT1+ZAAAAAgIy75kAAAACA4zTmQAAAACDNVOZAAAAAgFMl5kAAAACAUyXmQAAAAKCQKOZAAAAAYD7Y5UAAAADg8kfmQAAAAGAfR+ZAAAAAoOjV5EAAAABgNrrkQAAAAOAbmeVAAAAAADnj5UAAAADgWeblQAAAAODaUOVAAAAAIEZO5UAAAACAa1DkQAAAAMDljONAAAAAoKl\u002f40AAAAAA+A3lQAAAACBNL+VAAAAAIBUs5UAAAABAc8jlQAAAAGCWreVAAAAAID2Y5UAAAABgGPDlQAAAAAAXCOZAAAAAQMI55kAAAABgr3jmQAAAAGBgXuZAAAAAoChk5kAAAADAlR\u002fmQAAAAEDr1eVAAAAAoLfw5UAAAABACRXmQAAAAEBK2+VAAAAAwC4O5kAAAADgE2HmQAAAAADncuZAAAAAYG6f5kAAAAAAD4bmQAAAAACX7OZAAAAAAJeK5kAAAAAgNWTmQAAAACDkuuZAAAAAoMgb50AAAAAAOQDnQAAAAIDrCedAAAAAoI\u002fr5kAAAABAG43mQAAAAKDQZOZAAAAAoO845kAAAADAHGPmQAAAAAAAmuZAAAAAAJgJ50AAAADg2kznQAAAAIAFV+dAAAAAQKmD50AAAABAE3PnQAAAAEATc+dAAAAAQBNz50AAAADA\u002fkHnQAAAACCEaOdAAAAAoC+c50AAAACgd6vnQAAAAEABRuhAAAAAoNFT6EAAAADgy1HoQAAAACAuFOhAAAAAIC4U6EAAAADAvhLoQAAAAOCpmudAAAAAgDq+50AAAADgO+\u002fmQAAAAGDoAOdAAAAAgMLc5kAAAADAnZrmQAAAAKD45OZAAAAAwC175kAAAADALXvmQAAAAMAte+ZAAAAAYAeC5kAAAACAcvfmQAAAAIAKpOZAAAAAgHoT5kAAAACABO\u002flQAAAAEBxJeVAAAAAIJ345EAAAAAA10zkQAAAAIC0YuNAAAAAYLZX5EAAAACA\u002fdrkQAAAAMAknOVAAAAA4HsK5UAAAADgY1PlQAAAAIACCuRAAAAAgIOT40AAAAAgXaDjQAAAAIBcw+JAAAAAQCmY4UAAAACAfPnhQAAAAEBLl+NAAAAAwG2m4kAAAADg+R3jQA=="},"type":"scatter","xaxis":"x","yaxis":"y"},{"hovertemplate":"🏛️ 美債10Y殖利率: %{y:.2f}%\u003cextra\u003e\u003c\u002fextra\u003e","line":{"color":"#f43f5e","dash":"dash","width":2.2},"name":"🏛️ 美債10Y殖利率 (^TNX)","x":["2026-06-01T00:00:00","2026-06-02T00:00:00","2026-06-03T00:00:00","2026-06-04T00:00:00","2026-06-05T00:00:00","2026-06-08T00:00:00","2026-06-09T00:00:00","2026-06-10T00:00:00","2026-06-11T00:00:00","2026-06-12T00:00:00","2026-06-15T00:00:00","2026-06-16T00:00:00","2026-06-17T00:00:00","2026-06-18T00:00:00","2026-06-22T00:00:00","2026-06-23T00:00:00","2026-06-24T00:00:00","2026-06-25T00:00:00","2026-06-26T00:00:00","2026-06-29T00:00:00","2026-06-30T00:00:00","2026-07-01T00:00:00","2026-07-02T00:00:00","2026-07-03T00:00:00","2026-07-06T00:00:00","2026-07-07T00:00:00","2026-07-08T00:00:00","2026-07-09T00:00:00","2026-07-10T00:00:00","2026-07-13T00:00:00","2026-07-14T00:00:00","2026-07-15T00:00:00","2026-07-16T00:00:00","2026-07-17T00:00:00","2026-07-20T00:00:00","2026-07-21T00:00:00","2026-07-22T00:00:00","2026-07-23T00:00:00","2026-07-24T00:00:00","2026-07-27T00:00:00","2026-07-28T00:00:00","2026-07-29T00:00:00","2026-07-30T00:00:00","2026-07-31T00:00:00","2026-08-03T00:00:00","2026-08-04T00:00:00","2026-08-05T00:00:00","2026-08-06T00:00:00","2026-08-07T00:00:00","2026-08-10T00:00:00","2026-08-11T00:00:00","2026-08-12T00:00:00","2026-08-13T00:00:00","2026-08-14T00:00:00","2026-08-17T00:00:00","2026-08-18T00:00:00","2026-08-19T00:00:00","2026-08-20T00:00:00","2026-08-21T00:00:00","2026-08-24T00:00:00","2026-08-25T00:00:00","2026-08-26T00:00:00","2026-08-27T00:00:00","2026-08-28T00:00:00","2026-08-31T00:00:00","2026-09-01T00:00:00","2026-09-02T00:00:00","2026-09-03T00:00:00","2026-09-04T00:00:00","2026-09-07T00:00:00","2026-09-08T00:00:00","2026-09-09T00:00:00","2026-09-10T00:00:00","2026-09-11T00:00:00","2026-09-14T00:00:00","2026-09-15T00:00:00","2026-09-16T00:00:00","2026-09-17T00:00:00","2026-09-18T00:00:00","2026-09-21T00:00:00","2026-09-22T00:00:00","2026-09-23T00:00:00","2026-09-24T00:00:00","2026-09-25T00:00:00","2026-09-28T00:00:00","2026-09-29T00:00:00","2026-09-30T00:00:00","2026-10-01T00:00:00","2026-10-02T00:00:00","2026-10-05T00:00:00","2026-10-06T00:00:00","2026-10-07T00:00:00","2026-10-08T00:00:00","2026-10-09T00:00:00","2026-10-12T00:00:00","2026-10-13T00:00:00","2026-10-14T00:00:00","2026-10-15T00:00:00","2026-10-16T00:00:00","2026-10-19T00:00:00","2026-10-20T00:00:00","2026-10-21T00:00:00","2026-10-22T00:00:00","2026-10-23T00:00:00","2026-10-26T00:00:00","2026-10-27T00:00:00","2026-10-28T00:00:00","2026-10-29T00:00:00","2026-10-30T00:00:00","2026-11-02T00:00:00","2026-11-03T00:00:00","2026-11-04T00:00:00","2026-11-05T00:00:00","2026-11-06T00:00:00","2026-11-09T00:00:00","2026-11-10T00:00:00","2026-11-11T00:00:00","2026-11-12T00:00:00","2026-11-13T00:00:00","2026-11-16T00:00:00","2026-11-17T00:00:00","2026-11-18T00:00:00","2026-11-19T00:00:00","2026-11-20T00:00:00","2026-11-23T00:00:00","2026-11-24T00:00:00","2026-11-25T00:00:00","2026-11-26T00:00:00"],"y":{"dtype":"f8","bdata":"AAAAYGbmEUAAAACA69ERQAAAAMDI9hFAAAAAwHLoEUAAAAAg3SQSQAAAAIA\u002fNRJAAAAAAKwcEkAAAAAAAisSQAAAAKAc2hFAAAAAILDyEUAAAACAQeARQAAAAKBFthFAAAAAoBzaEUAAAAAA080RQAAAAEA3CRJAAAAAANX4EUAAAADgpZsRQAAAAIBokRFAAAAAoO18EUAAAADg+X4RQAAAAEAIrBFAAAAAYGbmEUAAAADgo\u002fARQAAAAOCj8BFAAAAAAH\u002fqEUAAAAAgsh0SQAAAAOCnRhJAAAAAoO8nEkAAAADgp0YSQAAAAMCdbxJAAAAAQApXEkAAAACAFC4SQAAAAOCnRhJAAAAA4PspEkAAAAAgWmQSQAAAAGASgxJAAAAAoMSgEkAAAABA388SQAAAAMBLtxJAAAAAQGKQEkAAAAAAf2oSQAAAAKDtfBJAAAAAgOmmEkAAAABA4foSQAAAAMB2vhJAAAAAQAyCEkAAAADgzncSQAAAAIAUrhJAAAAAANejEkAAAACgxssSQAAAAIBqvBJAAAAAQF66EkAAAABAYpASQAAAAEC0yBJAAAAAQGDlEkAAAACg8dISQAAAAACsnBJAAAAAQLTIEkAAAABAtvMSQAAAAGDl0BJAAAAAAFaOEkAAAACg76cSQAAAAMAgsBJAAAAAoEfhEkAAAAAgMQgTQAAAAKAaLxNAAAAAoBovE0AAAADASQwTQAAAAODQIhNAAAAA4NAiE0AAAAAgWDkTQAAAAIAWWRNAAAAA4KfGE0AAAABgZuYTQAAAAGAQ2BNAAAAAYOf7E0AAAADgJAYUQAAAAGC6yRNAAAAAwPP9E0AAAACgHNoTQAAAAGA73xNAAAAAYLx0FEAAAABg46UUQAAAAIBqvBRAAAAAgML1FEAAAADAHgUVQAAAAEAILBVAAAAAILDyFEAAAADgpRsVQAAAAMB2PhVAAAAAwHQTFUAAAADgpRsVQAAAAECL7BRAAAAAINv5FEAAAACAwvUUQAAAAEA13hRAAAAAYI\u002fCFEAAAADgIlsUQAAAACBaZBRAAAAAoEOLFEAAAADgzncUQAAAAACBlRRAAAAAQN\u002fPE0AAAABAtvMTQAAAAACq8RNAAAAAANX4E0AAAACAFC4UQAAAAGC89BNAAAAAwEu3E0AAAADAdJMTQAAAACDZzhNAAAAAwHSTE0AAAACAFlkTQAAAAMCdbxNAAAAAYLx0E0AAAACAl+4TQAAAAMDz\u002fRNAAAAA4HhpFEAAAAAgsp0UQAAAAGDnexRAAAAA4HhpFEAAAACAlUMUQAAAAIA\u002fNRRAAAAAYOOlE0AAAABACKwTQAAAACCynRNAAAAAIFpkE0AAAAAgWmQTQA=="},"type":"scatter","xaxis":"x","yaxis":"y2"},{"hovertemplate":"🗽 美債30Y長債: %{y:.2f}%\u003cextra\u003e\u003c\u002fextra\u003e","line":{"color":"#c084fc","dash":"dot","width":2.0},"name":"🗽 美債30Y長債 (^TYX)","x":["2026-06-01T00:00:00","2026-06-02T00:00:00","2026-06-03T00:00:00","2026-06-04T00:00:00","2026-06-05T00:00:00","2026-06-08T00:00:00","2026-06-09T00:00:00","2026-06-10T00:00:00","2026-06-11T00:00:00","2026-06-12T00:00:00","2026-06-15T00:00:00","2026-06-16T00:00:00","2026-06-17T00:00:00","2026-06-18T00:00:00","2026-06-22T00:00:00","2026-06-23T00:00:00","2026-06-24T00:00:00","2026-06-25T00:00:00","2026-06-26T00:00:00","2026-06-29T00:00:00","2026-06-30T00:00:00","2026-07-01T00:00:00","2026-07-02T00:00:00","2026-07-03T00:00:00","2026-07-06T00:00:00","2026-07-07T00:00:00","2026-07-08T00:00:00","2026-07-09T00:00:00","2026-07-10T00:00:00","2026-07-13T00:00:00","2026-07-14T00:00:00","2026-07-15T00:00:00","2026-07-16T00:00:00","2026-07-17T00:00:00","2026-07-20T00:00:00","2026-07-21T00:00:00","2026-07-22T00:00:00","2026-07-23T00:00:00","2026-07-24T00:00:00","2026-07-27T00:00:00","2026-07-28T00:00:00","2026-07-29T00:00:00","2026-07-30T00:00:00","2026-07-31T00:00:00","2026-08-03T00:00:00","2026-08-04T00:00:00","2026-08-05T00:00:00","2026-08-06T00:00:00","2026-08-07T00:00:00","2026-08-10T00:00:00","2026-08-11T00:00:00","2026-08-12T00:00:00","2026-08-13T00:00:00","2026-08-14T00:00:00","2026-08-17T00:00:00","2026-08-18T00:00:00","2026-08-19T00:00:00","2026-08-20T00:00:00","2026-08-21T00:00:00","2026-08-24T00:00:00","2026-08-25T00:00:00","2026-08-26T00:00:00","2026-08-27T00:00:00","2026-08-28T00:00:00","2026-08-31T00:00:00","2026-09-01T00:00:00","2026-09-02T00:00:00","2026-09-03T00:00:00","2026-09-04T00:00:00","2026-09-07T00:00:00","2026-09-08T00:00:00","2026-09-09T00:00:00","2026-09-10T00:00:00","2026-09-11T00:00:00","2026-09-14T00:00:00","2026-09-15T00:00:00","2026-09-16T00:00:00","2026-09-17T00:00:00","2026-09-18T00:00:00","2026-09-21T00:00:00","2026-09-22T00:00:00","2026-09-23T00:00:00","2026-09-24T00:00:00","2026-09-25T00:00:00","2026-09-28T00:00:00","2026-09-29T00:00:00","2026-09-30T00:00:00","2026-10-01T00:00:00","2026-10-02T00:00:00","2026-10-05T00:00:00","2026-10-06T00:00:00","2026-10-07T00:00:00","2026-10-08T00:00:00","2026-10-09T00:00:00","2026-10-12T00:00:00","2026-10-13T00:00:00","2026-10-14T00:00:00","2026-10-15T00:00:00","2026-10-16T00:00:00","2026-10-19T00:00:00","2026-10-20T00:00:00","2026-10-21T00:00:00","2026-10-22T00:00:00","2026-10-23T00:00:00","2026-10-26T00:00:00","2026-10-27T00:00:00","2026-10-28T00:00:00","2026-10-29T00:00:00","2026-10-30T00:00:00","2026-11-02T00:00:00","2026-11-03T00:00:00","2026-11-04T00:00:00","2026-11-05T00:00:00","2026-11-06T00:00:00","2026-11-09T00:00:00","2026-11-10T00:00:00","2026-11-11T00:00:00","2026-11-12T00:00:00","2026-11-13T00:00:00","2026-11-16T00:00:00","2026-11-17T00:00:00","2026-11-18T00:00:00","2026-11-19T00:00:00","2026-11-20T00:00:00","2026-11-23T00:00:00","2026-11-24T00:00:00","2026-11-25T00:00:00","2026-11-26T00:00:00"],"y":{"dtype":"f8","bdata":"AAAAwMj2E0AAAABANd4TQAAAAIDC9RNAAAAA4HjpE0AAAADg+f4TQAAAAICTGBRAAAAAoEMLFEAAAACgmRkUQAAAAADTzRNAAAAAYGbmE0AAAADgTeITQAAAAKBFthNAAAAAYDm0E0AAAADAn5oTQAAAAGC6yRNAAAAAYI\u002fCE0AAAABAi2wTQAAAAICXbhNAAAAAYLx0E0AAAADgo3ATQAAAAOClmxNAAAAAIC\u002fdE0AAAADgo\u002fATQAAAAOCj8BNAAAAAANX4E0AAAABACCwUQAAAAGCPQhRAAAAAoEU2FEAAAABAtEgUQAAAACBaZBRAAAAAgEFgFEAAAAAA\u002flQUQAAAACBaZBRAAAAAQIlBFEAAAAAA1XgUQAAAAMAehRRAAAAAIIeWFEAAAACgGq8UQAAAAGDjpRRAAAAAAACAFEAAAADgTWIUQAAAAKBukhRAAAAAAP7UFEAAAACgmRkVQAAAAECL7BRAAAAAYI\u002fCFEAAAAAALbIUQAAAAKAc2hRAAAAAYBDYFEAAAAAA1fgUQAAAAACq8RRAAAAAoO38FEAAAACgHNoUQAAAACBcDxVAAAAAgGo8FUAAAAAA1yMVQAAAAOCnxhRAAAAAILDyFEAAAADAnxoVQAAAAECL7BRAAAAAAC2yFEAAAADAdr4UQAAAAICVwxRAAAAAoPHSFEAAAADg+f4UQAAAAKBuEhVAAAAAgGgRFUAAAAAA1fgUQAAAAGDn+xRAAAAAYOf7FEAAAAAAVg4VQAAAACDdJBVAAAAAAKpxFUAAAAAAf2oVQAAAAGDlUBVAAAAAYLx0FUAAAABAYGUVQAAAAKAaLxVAAAAAoPFSFUAAAACgGi8VQAAAAKBFNhVAAAAAwJ+aFUAAAABgENgVQAAAAKAYBBZAAAAAwHY+FkAAAACAQWAWQAAAAOBPjRZAAAAA4HhpFkAAAADAHoUWQAAAAMD1qBZAAAAAQGKQFkAAAAAg3aQWQAAAAECLbBZAAAAAYGZmFkAAAAAgWmQWQAAAACCDQBZAAAAAoJkZFkAAAADAS7cVQAAAAMB2vhVAAAAAAFTjFUAAAABAM7MVQAAAAECJwRVAAAAAYOMlFUAAAABgj0IVQAAAAGA5NBVAAAAA4FE4FUAAAAAAqnEVQAAAAGDlUBVAAAAAgGo8FUAAAADAdBMVQAAAAKDGSxVAAAAAoMQgFUAAAAAgBgEVQAAAAIA9ChVAAAAA4CQGFUAAAABgZmYVQAAAAECLbBVAAAAAYGS7FUAAAABAi+wVQAAAAEA13hVAAAAAAP7UFUAAAABg46UVQAAAAMCfmhVAAAAAoEU2FUAAAABgDi0VQAAAAAACKxVAAAAA4KPwFEAAAADgo\u002fAUQA=="},"type":"scatter","xaxis":"x","yaxis":"y2"},{"hovertemplate":"🏦 聯準會 \u002f 3 月期國債利率基準利率: %{y:.2f}%\u003cextra\u003e\u003c\u002fextra\u003e","line":{"color":"#fb923c","shape":"hv","width":2.0},"name":"🏦 聯準會 \u002f 3 月期國債利率基準利率 (^IRX)","x":["2026-06-01T00:00:00","2026-06-02T00:00:00","2026-06-03T00:00:00","2026-06-04T00:00:00","2026-06-05T00:00:00","2026-06-08T00:00:00","2026-06-09T00:00:00","2026-06-10T00:00:00","2026-06-11T00:00:00","2026-06-12T00:00:00","2026-06-15T00:00:00","2026-06-16T00:00:00","2026-06-17T00:00:00","2026-06-18T00:00:00","2026-06-22T00:00:00","2026-06-23T00:00:00","2026-06-24T00:00:00","2026-06-25T00:00:00","2026-06-26T00:00:00","2026-06-29T00:00:00","2026-06-30T00:00:00","2026-07-01T00:00:00","2026-07-02T00:00:00","2026-07-03T00:00:00","2026-07-06T00:00:00","2026-07-07T00:00:00","2026-07-08T00:00:00","2026-07-09T00:00:00","2026-07-10T00:00:00","2026-07-13T00:00:00","2026-07-14T00:00:00","2026-07-15T00:00:00","2026-07-16T00:00:00","2026-07-17T00:00:00","2026-07-20T00:00:00","2026-07-21T00:00:00","2026-07-22T00:00:00","2026-07-23T00:00:00","2026-07-24T00:00:00","2026-07-27T00:00:00","2026-07-28T00:00:00","2026-07-29T00:00:00","2026-07-30T00:00:00","2026-07-31T00:00:00","2026-08-03T00:00:00","2026-08-04T00:00:00","2026-08-05T00:00:00","2026-08-06T00:00:00","2026-08-07T00:00:00","2026-08-10T00:00:00","2026-08-11T00:00:00","2026-08-12T00:00:00","2026-08-13T00:00:00","2026-08-14T00:00:00","2026-08-17T00:00:00","2026-08-18T00:00:00","2026-08-19T00:00:00","2026-08-20T00:00:00","2026-08-21T00:00:00","2026-08-24T00:00:00","2026-08-25T00:00:00","2026-08-26T00:00:00","2026-08-27T00:00:00","2026-08-28T00:00:00","2026-08-31T00:00:00","2026-09-01T00:00:00","2026-09-02T00:00:00","2026-09-03T00:00:00","2026-09-04T00:00:00","2026-09-07T00:00:00","2026-09-08T00:00:00","2026-09-09T00:00:00","2026-09-10T00:00:00","2026-09-11T00:00:00","2026-09-14T00:00:00","2026-09-15T00:00:00","2026-09-16T00:00:00","2026-09-17T00:00:00","2026-09-18T00:00:00","2026-09-21T00:00:00","2026-09-22T00:00:00","2026-09-23T00:00:00","2026-09-24T00:00:00","2026-09-25T00:00:00","2026-09-28T00:00:00","2026-09-29T00:00:00","2026-09-30T00:00:00","2026-10-01T00:00:00","2026-10-02T00:00:00","2026-10-05T00:00:00","2026-10-06T00:00:00","2026-10-07T00:00:00","2026-10-08T00:00:00","2026-10-09T00:00:00","2026-10-12T00:00:00","2026-10-13T00:00:00","2026-10-14T00:00:00","2026-10-15T00:00:00","2026-10-16T00:00:00","2026-10-19T00:00:00","2026-10-20T00:00:00","2026-10-21T00:00:00","2026-10-22T00:00:00","2026-10-23T00:00:00","2026-10-26T00:00:00","2026-10-27T00:00:00","2026-10-28T00:00:00","2026-10-29T00:00:00","2026-10-30T00:00:00","2026-11-02T00:00:00","2026-11-03T00:00:00","2026-11-04T00:00:00","2026-11-05T00:00:00","2026-11-06T00:00:00","2026-11-09T00:00:00","2026-11-10T00:00:00","2026-11-11T00:00:00","2026-11-12T00:00:00","2026-11-13T00:00:00","2026-11-16T00:00:00","2026-11-17T00:00:00","2026-11-18T00:00:00","2026-11-19T00:00:00","2026-11-20T00:00:00","2026-11-23T00:00:00","2026-11-24T00:00:00","2026-11-25T00:00:00","2026-11-26T00:00:00"],"y":{"dtype":"f8","bdata":"AAAAgML1DEAAAAAAqvEMQAAAAGDn+wxAAAAAgML1DEAAAAAAAAANQAAAAOAkBg1AAAAA4HoUDUAAAADgehQNQAAAAGDn+wxAAAAAAKrxDEAAAAAAqvEMQAAAAIA9Cg1AAAAAYA4tDUAAAACAlUMNQAAAAOCjcA1AAAAAwB6FDUAAAADAHoUNQAAAAOCjcA1AAAAAANNNDUAAAADgo3ANQAAAAOAi2w1AAAAAoJmZDUAAAABgEFgNQAAAAGAQWA1AAAAAwB6FDUAAAADAzMwNQAAAAEC0yA1AAAAAYLx0DUAAAAAgXI8NQAAAAKDx0g1AAAAAoJmZDUAAAAAgBoENQAAAAMB0kw1AAAAAoO+nDUAAAAAA16MNQAAAAEAK1w1AAAAAgML1DUAAAABgZmYOQAAAAOCjcA5AAAAAgEFgDkAAAADgehQOQAAAAICVQw1AAAAAYGZmDUAAAABgvHQNQAAAAKCZmQ1AAAAAQArXDUAAAADAzMwNQAAAAOAi2w1AAAAAgBSuDUAAAADAdr4NQAAAAEAK1w1AAAAAoO+nDUAAAAAA16MNQAAAAMB0kw1AAAAAgL6fDUAAAAAA16MNQAAAAKCZmQ1AAAAAgL6fDUAAAACAFK4NQAAAAIC+nw1AAAAAANejDUAAAADAHoUNQAAAAECLbA1AAAAAQArXDUAAAADgItsNQAAAAGAOLQ5AAAAAYA4tDkAAAAAghesNQAAAAABWDg5AAAAAAFYODkAAAABAMzMOQAAAAOCjcA5AAAAAYI\u002fCDkAAAAAA000PQAAAAEDheg9AAAAAgBSuD0AAAABgj8IPQAAAAOBRuA9AAAAAoPHSD0AAAADgItsPQAAAAMAeBRBAAAAAAKwcEEAAAADAoUUQQAAAACCuRxBAAAAAQF46EEAAAABgj0IQQAAAAGC4HhBAAAAA4CLbD0AAAAAAqvEPQAAAAKBuEhBAAAAAYOMlEEAAAABg4yUQQAAAAEAILBBAAAAAQF46EEAAAABAMzMQQAAAAEBeOhBAAAAAQApXEEAAAACgHFoQQAAAACCuRxBAAAAAwMxMEEAAAACA61EQQAAAACCDQBBAAAAAIIcWEEAAAACgxCAQQAAAAKCZGRBAAAAAwPUoEEAAAACAwvUPQAAAAGDn+w9AAAAAQLTID0AAAADgItsPQAAAAKCZGRBAAAAAoJkZEEAAAABAYOUPQAAAAAAAABBAAAAAANcjEEAAAACAwnUQQAAAAIDCdRBAAAAAYBKDEEAAAACg7XwQQAAAAAAAgBBAAAAA4E+NEEAAAADgepQQQAAAACCHlhBAAAAAoO18EEAAAAAgh5YQQAAAAEAIrBBAAAAAYLieEEAAAABguJ4QQA=="},"type":"scatter","xaxis":"x","yaxis":"y2"},{"hovertemplate":"📊 那指盈餘殖利率: %{y:.2f}%\u003cextra\u003e\u003c\u002fextra\u003e","line":{"color":"#67e8f9","dash":"dashdot","width":2.0},"name":"📊 那指盈餘殖利率 (1\u002fPE)","x":["2026-06-01T00:00:00","2026-06-02T00:00:00","2026-06-03T00:00:00","2026-06-04T00:00:00","2026-06-05T00:00:00","2026-06-08T00:00:00","2026-06-09T00:00:00","2026-06-10T00:00:00","2026-06-11T00:00:00","2026-06-12T00:00:00","2026-06-15T00:00:00","2026-06-16T00:00:00","2026-06-17T00:00:00","2026-06-18T00:00:00","2026-06-22T00:00:00","2026-06-23T00:00:00","2026-06-24T00:00:00","2026-06-25T00:00:00","2026-06-26T00:00:00","2026-06-29T00:00:00","2026-06-30T00:00:00","2026-07-01T00:00:00","2026-07-02T00:00:00","2026-07-03T00:00:00","2026-07-06T00:00:00","2026-07-07T00:00:00","2026-07-08T00:00:00","2026-07-09T00:00:00","2026-07-10T00:00:00","2026-07-13T00:00:00","2026-07-14T00:00:00","2026-07-15T00:00:00","2026-07-16T00:00:00","2026-07-17T00:00:00","2026-07-20T00:00:00","2026-07-21T00:00:00","2026-07-22T00:00:00","2026-07-23T00:00:00","2026-07-24T00:00:00","2026-07-27T00:00:00","2026-07-28T00:00:00","2026-07-29T00:00:00","2026-07-30T00:00:00","2026-07-31T00:00:00","2026-08-03T00:00:00","2026-08-04T00:00:00","2026-08-05T00:00:00","2026-08-06T00:00:00","2026-08-07T00:00:00","2026-08-10T00:00:00","2026-08-11T00:00:00","2026-08-12T00:00:00","2026-08-13T00:00:00","2026-08-14T00:00:00","2026-08-17T00:00:00","2026-08-18T00:00:00","2026-08-19T00:00:00","2026-08-20T00:00:00","2026-08-21T00:00:00","2026-08-24T00:00:00","2026-08-25T00:00:00","2026-08-26T00:00:00","2026-08-27T00:00:00","2026-08-28T00:00:00","2026-08-31T00:00:00","2026-09-01T00:00:00","2026-09-02T00:00:00","2026-09-03T00:00:00","2026-09-04T00:00:00","2026-09-07T00:00:00","2026-09-08T00:00:00","2026-09-09T00:00:00","2026-09-10T00:00:00","2026-09-11T00:00:00","2026-09-14T00:00:00","2026-09-15T00:00:00","2026-09-16T00:00:00","2026-09-17T00:00:00","2026-09-18T00:00:00","2026-09-21T00:00:00","2026-09-22T00:00:00","2026-09-23T00:00:00","2026-09-24T00:00:00","2026-09-25T00:00:00","2026-09-28T00:00:00","2026-09-29T00:00:00","2026-09-30T00:00:00","2026-10-01T00:00:00","2026-10-02T00:00:00","2026-10-05T00:00:00","2026-10-06T00:00:00","2026-10-07T00:00:00","2026-10-08T00:00:00","2026-10-09T00:00:00","2026-10-12T00:00:00","2026-10-13T00:00:00","2026-10-14T00:00:00","2026-10-15T00:00:00","2026-10-16T00:00:00","2026-10-19T00:00:00","2026-10-20T00:00:00","2026-10-21T00:00:00","2026-10-22T00:00:00","2026-10-23T00:00:00","2026-10-26T00:00:00","2026-10-27T00:00:00","2026-10-28T00:00:00","2026-10-29T00:00:00","2026-10-30T00:00:00","2026-11-02T00:00:00","2026-11-03T00:00:00","2026-11-04T00:00:00","2026-11-05T00:00:00","2026-11-06T00:00:00","2026-11-09T00:00:00","2026-11-10T00:00:00","2026-11-11T00:00:00","2026-11-12T00:00:00","2026-11-13T00:00:00","2026-11-16T00:00:00","2026-11-17T00:00:00","2026-11-18T00:00:00","2026-11-19T00:00:00","2026-11-20T00:00:00","2026-11-23T00:00:00","2026-11-24T00:00:00","2026-11-25T00:00:00","2026-11-26T00:00:00"],"y":{"dtype":"f8","bdata":"9ihcj8L1CkD2KFyPwvUKQDMzMzMzMwtASOF6FK5HC0B7FK5H4XoMQD0K16NwPQxAexSuR+F6DEAK16NwPQoNQFK4HoXrUQxAPQrXo3A9DEBxPQrXo3ALQMP1KFyPwgtAFK5H4XoUDECamZmZmZkLQOxRuB6F6wtAj8L1KFyPDEC4HoXrUbgMQOF6FK5H4QxA4XoUrkfhDEBSuB6F61EMQOxRuB6F6wtAFK5H4XoUDEBSuB6F61EMQFK4HoXrUQxAAAAAAAAADEBSuB6F61EMQD0K16NwPQxA7FG4HoXrC0DXo3A9CtcLQD0K16NwPQxAAAAAAAAADEDXo3A9CtcLQD0K16NwPQxApHA9CtejDECkcD0K16MMQFK4HoXrUQxAexSuR+F6DEAfhetRuB4NQEjhehSuRw1AXI\u002fC9ShcDUBcj8L1KFwNQOxRuB6F6w1AH4XrUbgeDUDNzMzMzMwMQD0K16NwPQxAhetRuB6FC0DD9Shcj8ILQMP1KFyPwgtAcT0K16NwC0CF61G4HoULQK5H4XoUrgtAhetRuB6FC0BI4XoUrkcLQFyPwvUoXAtAcT0K16NwC0DXo3A9CtcLQMP1KFyPwgtAFK5H4XoUDEDsUbgehesLQClcj8L1KAxAAAAAAAAADEAAAAAAAAAMQIXrUbgehQtArkfhehSuC0DD9Shcj8ILQAAAAAAAAAxA7FG4HoXrC0CF61G4HoULQJqZmZmZmQtAmpmZmZmZC0CuR+F6FK4LQNejcD0K1wtAFK5H4XoUDEDD9Shcj8ILQOxRuB6F6wtAKVyPwvUoDEApXI\u002fC9SgMQK5H4XoUrgtAmpmZmZmZC0D2KFyPwvUKQOF6FK5H4QpAH4XrUbgeC0AfhetRuB4LQArXo3A9CgtASOF6FK5HC0BI4XoUrkcLQDMzMzMzMwtAMzMzMzMzC0DhehSuR+EKQKRwPQrXowpAexSuR+F6CkCPwvUoXI8KQOF6FK5H4QpAuB6F61G4CkDhehSuR+EKQOF6FK5H4QpAXI\u002fC9ShcC0Bcj8L1KFwLQAAAAAAAAAxArkfhehSuC0CuR+F6FK4LQFyPwvUoXAtAFK5H4XoUDEApXI\u002fC9SgMQOxRuB6F6wtAmpmZmZmZC0CF61G4HoULQOxRuB6F6wtAuB6F61G4DEAK16NwPQoNQM3MzMzMzAxAZmZmZmZmDEAUrkfhehQOQMP1KFyPwg1A9ihcj8L1DEAzMzMzMzMNQLgehetRuAxAzczMzMzMDEAfhetRuB4NQNejcD0K1w1AFK5H4XoUDkDsUbgehesNQKRwPQrXow5AKVyPwvUoEEBSuB6F61EOQM3MzMzMzA5ACtejcD0KD0AK16NwPQoPQA=="},"type":"scatter","xaxis":"x","yaxis":"y2"},{"hovertemplate":"📈 台股盈餘殖利率: %{y:.2f}%\u003cextra\u003e\u003c\u002fextra\u003e","line":{"color":"#86efac","dash":"dashdot","width":2.0},"name":"📈 台股盈餘殖利率 (1\u002fPE)","x":["2026-06-01T00:00:00","2026-06-02T00:00:00","2026-06-03T00:00:00","2026-06-04T00:00:00","2026-06-05T00:00:00","2026-06-08T00:00:00","2026-06-09T00:00:00","2026-06-10T00:00:00","2026-06-11T00:00:00","2026-06-12T00:00:00","2026-06-15T00:00:00","2026-06-16T00:00:00","2026-06-17T00:00:00","2026-06-18T00:00:00","2026-06-22T00:00:00","2026-06-23T00:00:00","2026-06-24T00:00:00","2026-06-25T00:00:00","2026-06-26T00:00:00","2026-06-29T00:00:00","2026-06-30T00:00:00","2026-07-01T00:00:00","2026-07-02T00:00:00","2026-07-03T00:00:00","2026-07-06T00:00:00","2026-07-07T00:00:00","2026-07-08T00:00:00","2026-07-09T00:00:00","2026-07-10T00:00:00","2026-07-13T00:00:00","2026-07-14T00:00:00","2026-07-15T00:00:00","2026-07-16T00:00:00","2026-07-17T00:00:00","2026-07-20T00:00:00","2026-07-21T00:00:00","2026-07-22T00:00:00","2026-07-23T00:00:00","2026-07-24T00:00:00","2026-07-27T00:00:00","2026-07-28T00:00:00","2026-07-29T00:00:00","2026-07-30T00:00:00","2026-07-31T00:00:00","2026-08-03T00:00:00","2026-08-04T00:00:00","2026-08-05T00:00:00","2026-08-06T00:00:00","2026-08-07T00:00:00","2026-08-10T00:00:00","2026-08-11T00:00:00","2026-08-12T00:00:00","2026-08-13T00:00:00","2026-08-14T00:00:00","2026-08-17T00:00:00","2026-08-18T00:00:00","2026-08-19T00:00:00","2026-08-20T00:00:00","2026-08-21T00:00:00","2026-08-24T00:00:00","2026-08-25T00:00:00","2026-08-26T00:00:00","2026-08-27T00:00:00","2026-08-28T00:00:00","2026-08-31T00:00:00","2026-09-01T00:00:00","2026-09-02T00:00:00","2026-09-03T00:00:00","2026-09-04T00:00:00","2026-09-07T00:00:00","2026-09-08T00:00:00","2026-09-09T00:00:00","2026-09-10T00:00:00","2026-09-11T00:00:00","2026-09-14T00:00:00","2026-09-15T00:00:00","2026-09-16T00:00:00","2026-09-17T00:00:00","2026-09-18T00:00:00","2026-09-21T00:00:00","2026-09-22T00:00:00","2026-09-23T00:00:00","2026-09-24T00:00:00","2026-09-25T00:00:00","2026-09-28T00:00:00","2026-09-29T00:00:00","2026-09-30T00:00:00","2026-10-01T00:00:00","2026-10-02T00:00:00","2026-10-05T00:00:00","2026-10-06T00:00:00","2026-10-07T00:00:00","2026-10-08T00:00:00","2026-10-09T00:00:00","2026-10-12T00:00:00","2026-10-13T00:00:00","2026-10-14T00:00:00","2026-10-15T00:00:00","2026-10-16T00:00:00","2026-10-19T00:00:00","2026-10-20T00:00:00","2026-10-21T00:00:00","2026-10-22T00:00:00","2026-10-23T00:00:00","2026-10-26T00:00:00","2026-10-27T00:00:00","2026-10-28T00:00:00","2026-10-29T00:00:00","2026-10-30T00:00:00","2026-11-02T00:00:00","2026-11-03T00:00:00","2026-11-04T00:00:00","2026-11-05T00:00:00","2026-11-06T00:00:00","2026-11-09T00:00:00","2026-11-10T00:00:00","2026-11-11T00:00:00","2026-11-12T00:00:00","2026-11-13T00:00:00","2026-11-16T00:00:00","2026-11-17T00:00:00","2026-11-18T00:00:00","2026-11-19T00:00:00","2026-11-20T00:00:00","2026-11-23T00:00:00","2026-11-24T00:00:00","2026-11-25T00:00:00","2026-11-26T00:00:00"],"y":{"dtype":"f8","bdata":"mpmZmZmZC0CF61G4HoULQPYoXI\u002fC9QpAcT0K16NwC0DD9Shcj8ILQM3MzMzMzAxAAAAAAAAADED2KFyPwvUMQArXo3A9Cg1AZmZmZmZmDECamZmZmZkLQFyPwvUoXAtASOF6FK5HC0D2KFyPwvUKQD0K16NwPQpAj8L1KFyPCkAzMzMzMzMLQB+F61G4HgtAFK5H4XoUDEDXo3A9CtcLQDMzMzMzMwtApHA9CtejCkDNzMzMzMwKQM3MzMzMzApA4XoUrkfhCkCF61G4HoULQFyPwvUoXAtAmpmZmZmZC0CamZmZmZkLQJqZmZmZmQtAAAAAAAAADEBxPQrXo3ALQHE9CtejcAtAXI\u002fC9ShcDUCF61G4HoUNQFK4HoXrUQxA7FG4HoXrC0DsUbgehesLQLgehetRuAxAuB6F61G4DEAUrkfhehQOQEjhehSuRw9AXI\u002fC9ShcD0AK16NwPQoNQOF6FK5H4QxA4XoUrkfhDEAUrkfhehQMQD0K16NwPQxAUrgehetRDEDsUbgehesLQMP1KFyPwgtAhetRuB6FC0AzMzMzMzMLQFyPwvUoXAtAXI\u002fC9ShcC0CuR+F6FK4LQAAAAAAAAAxA7FG4HoXrC0CuR+F6FK4LQAAAAAAAAAxAw\u002fUoXI\u002fCC0Bcj8L1KFwLQEjhehSuRwtACtejcD0KC0AzMzMzMzMLQLgehetRuApAH4XrUbgeC0Bcj8L1KFwLQOF6FK5H4QpAexSuR+F6CkCPwvUoXI8KQI\u002fC9ShcjwpAuB6F61G4CkAfhetRuB4LQEjhehSuRwtAhetRuB6FC0Bcj8L1KFwLQArXo3A9CgtAj8L1KFyPCkA9CtejcD0KQD0K16NwPQpAAAAAAAAACkAUrkfhehQKQBSuR+F6FApAFK5H4XoUCkBSuB6F61EKQClcj8L1KApA7FG4HoXrCUDXo3A9CtcJQDMzMzMzMwlAH4XrUbgeCUAfhetRuB4JQHE9CtejcAlAcT0K16NwCUBxPQrXo3AJQOxRuB6F6wlAw\u002fUoXI\u002fCCUCkcD0K16MKQI\u002fC9ShcjwpAuB6F61G4CkAK16NwPQoLQLgehetRuApAMzMzMzMzC0AzMzMzMzMLQDMzMzMzMwtAMzMzMzMzC0CkcD0K16MKQArXo3A9CgtArkfhehSuC0DsUbgehesLQPYoXI\u002fC9QxAMzMzMzMzDUApXI\u002fC9SgOQIXrUbgehQ9AFK5H4XoUDkBcj8L1KFwNQFK4HoXrUQxACtejcD0KDUC4HoXrUbgMQI\u002fC9Shcjw5ASOF6FK5HD0AzMzMzMzMPQFK4HoXrURBAZmZmZmZmEUAAAAAAAAARQDMzMzMzMw9AZmZmZmZmEEAAAAAAAAAQQA=="},"type":"scatter","xaxis":"x","yaxis":"y2"},{"hovertemplate":"💎 美股對美債 10Y ERP: %{y:+.2f}%\u003cextra\u003e\u003c\u002fextra\u003e","line":{"color":"#e879f9","width":2.5},"name":"💎 美股對美債 10Y ERP 溢酬","x":["2026-06-01T00:00:00","2026-06-02T00:00:00","2026-06-03T00:00:00","2026-06-04T00:00:00","2026-06-05T00:00:00","2026-06-08T00:00:00","2026-06-09T00:00:00","2026-06-10T00:00:00","2026-06-11T00:00:00","2026-06-12T00:00:00","2026-06-15T00:00:00","2026-06-16T00:00:00","2026-06-17T00:00:00","2026-06-18T00:00:00","2026-06-22T00:00:00","2026-06-23T00:00:00","2026-06-24T00:00:00","2026-06-25T00:00:00","2026-06-26T00:00:00","2026-06-29T00:00:00","2026-06-30T00:00:00","2026-07-01T00:00:00","2026-07-02T00:00:00","2026-07-03T00:00:00","2026-07-06T00:00:00","2026-07-07T00:00:00","2026-07-08T00:00:00","2026-07-09T00:00:00","2026-07-10T00:00:00","2026-07-13T00:00:00","2026-07-14T00:00:00","2026-07-15T00:00:00","2026-07-16T00:00:00","2026-07-17T00:00:00","2026-07-20T00:00:00","2026-07-21T00:00:00","2026-07-22T00:00:00","2026-07-23T00:00:00","2026-07-24T00:00:00","2026-07-27T00:00:00","2026-07-28T00:00:00","2026-07-29T00:00:00","2026-07-30T00:00:00","2026-07-31T00:00:00","2026-08-03T00:00:00","2026-08-04T00:00:00","2026-08-05T00:00:00","2026-08-06T00:00:00","2026-08-07T00:00:00","2026-08-10T00:00:00","2026-08-11T00:00:00","2026-08-12T00:00:00","2026-08-13T00:00:00","2026-08-14T00:00:00","2026-08-17T00:00:00","2026-08-18T00:00:00","2026-08-19T00:00:00","2026-08-20T00:00:00","2026-08-21T00:00:00","2026-08-24T00:00:00","2026-08-25T00:00:00","2026-08-26T00:00:00","2026-08-27T00:00:00","2026-08-28T00:00:00","2026-08-31T00:00:00","2026-09-01T00:00:00","2026-09-02T00:00:00","2026-09-03T00:00:00","2026-09-04T00:00:00","2026-09-07T00:00:00","2026-09-08T00:00:00","2026-09-09T00:00:00","2026-09-10T00:00:00","2026-09-11T00:00:00","2026-09-14T00:00:00","2026-09-15T00:00:00","2026-09-16T00:00:00","2026-09-17T00:00:00","2026-09-18T00:00:00","2026-09-21T00:00:00","2026-09-22T00:00:00","2026-09-23T00:00:00","2026-09-24T00:00:00","2026-09-25T00:00:00","2026-09-28T00:00:00","2026-09-29T00:00:00","2026-09-30T00:00:00","2026-10-01T00:00:00","2026-10-02T00:00:00","2026-10-05T00:00:00","2026-10-06T00:00:00","2026-10-07T00:00:00","2026-10-08T00:00:00","2026-10-09T00:00:00","2026-10-12T00:00:00","2026-10-13T00:00:00","2026-10-14T00:00:00","2026-10-15T00:00:00","2026-10-16T00:00:00","2026-10-19T00:00:00","2026-10-20T00:00:00","2026-10-21T00:00:00","2026-10-22T00:00:00","2026-10-23T00:00:00","2026-10-26T00:00:00","2026-10-27T00:00:00","2026-10-28T00:00:00","2026-10-29T00:00:00","2026-10-30T00:00:00","2026-11-02T00:00:00","2026-11-03T00:00:00","2026-11-04T00:00:00","2026-11-05T00:00:00","2026-11-06T00:00:00","2026-11-09T00:00:00","2026-11-10T00:00:00","2026-11-11T00:00:00","2026-11-12T00:00:00","2026-11-13T00:00:00","2026-11-16T00:00:00","2026-11-17T00:00:00","2026-11-18T00:00:00","2026-11-19T00:00:00","2026-11-20T00:00:00","2026-11-23T00:00:00","2026-11-24T00:00:00","2026-11-25T00:00:00","2026-11-26T00:00:00"],"y":{"dtype":"f8","bdata":"mpmZmZmZ8b9I4XoUrkfxv3E9CtejcPG\u002fH4XrUbge8b9cj8L1KFzvv1K4HoXrUfC\u002fCtejcD0K778fhetRuB7tv3E9CtejcO2\u002fuB6F61G47r+kcD0K16Pwv7gehetRuO6\u002fZmZmZmZm7r8AAAAAAADwv1K4HoXrUfC\u002fcT0K16Nw7b\u002fsUbgehevpv\u002fYoXI\u002fC9ei\u002fUrgehetR6L+PwvUoXI\u002fqv8P1KFyPwu2\u002fuB6F61G47r9mZmZmZmbuv2ZmZmZmZu6\u002fXI\u002fC9Shc77+uR+F6FK7vv6RwPQrXo\u002fC\u002fzczMzMzM8L9xPQrXo3Dxv0jhehSuR\u002fG\u002fcT0K16Nw8b8fhetRuB7xv6RwPQrXo\u002fC\u002fuB6F61G47r9SuB6F61Hwv3E9CtejcPG\u002fmpmZmZmZ8b\u002f2KFyPwvXwv1K4HoXrUfC\u002fCtejcD0K77\u002fD9Shcj8Ltvylcj8L1KOy\u002fUrgehetR8L89CtejcD3yv4\u002fC9Shcj\u002fK\u002fCtejcD0K879mZmZmZmbyvzMzMzMzM\u002fO\u002frkfhehSu878pXI\u002fC9Sj0v4XrUbgehfO\u002f16NwPQrX87+uR+F6FK7zv3sUrkfhevS\u002fpHA9Ctej9L+uR+F6FK7zv+F6FK5H4fK\u002fCtejcD0K878AAAAAAAD0v+F6FK5H4fK\u002fPQrXo3A98r+PwvUoXI\u002fyv65H4XoUrvO\u002fKVyPwvUo9L+kcD0K16P0v83MzMzMzPS\u002f9ihcj8L19L8fhetRuB71v0jhehSuR\u002fW\u002fSOF6FK5H9b+amZmZmZn1v8P1KFyPwvW\u002f4XoUrkfh9r8AAAAAAAD4v4XrUbgehfe\u002frkfhehSu97\u002fXo3A9Ctf3v9ejcD0K1\u002fe\u002fzczMzMzM+L9xPQrXo3D5v8P1KFyPwvm\u002fhetRuB6F+79SuB6F61H8v83MzMzMzPy\u002fSOF6FK5H\u002fb+amZmZmZn9vz0K16NwPf6\u002fcT0K16Nw\u002fb+4HoXrUbj+v65H4XoUrv+\u002fXI\u002fC9Shc\u002f79cj8L1KFz\u002fv+xRuB6F6\u002f2\u002fZmZmZmZm\u002fr8UrkfhehT+v8P1KFyPwv2\u002fUrgehetR\u002fL+4HoXrUbj6v5qZmZmZmfm\u002f4XoUrkfh+r+PwvUoXI\u002f6v65H4XoUrvu\u002fCtejcD0K97+F61G4HoX3vwAAAAAAAPi\u002fpHA9Ctej+L\u002fD9Shcj8L5vwAAAAAAAPi\u002fcT0K16Nw9b8pXI\u002fC9Sj0v5qZmZmZmfW\u002fcT0K16Nw9b9I4XoUrkfxvz0K16NwPfK\u002f16NwPQrX879I4XoUrkf1v4\u002fC9Shcj\u002fa\u002fAAAAAAAA+L8pXI\u002fC9Sj4vz0K16NwPfa\u002fcT0K16Nw9b9I4XoUrkf1v4XrUbgehfO\u002f16NwPQrX678UrkfhehTyv83MzMzMzPC\u002fCtejcD0K778K16NwPQrvvw=="},"type":"scatter","xaxis":"x","yaxis":"y2"},{"hovertemplate":"⚖️ 台股獲利對美債 10Y ERP: %{y:+.2f}%\u003cextra\u003e\u003c\u002fextra\u003e","line":{"color":"#2dd4bf","width":2.5},"name":"⚖️ 台股獲利對美債 10Y ERP","x":["2026-06-01T00:00:00","2026-06-02T00:00:00","2026-06-03T00:00:00","2026-06-04T00:00:00","2026-06-05T00:00:00","2026-06-08T00:00:00","2026-06-09T00:00:00","2026-06-10T00:00:00","2026-06-11T00:00:00","2026-06-12T00:00:00","2026-06-15T00:00:00","2026-06-16T00:00:00","2026-06-17T00:00:00","2026-06-18T00:00:00","2026-06-22T00:00:00","2026-06-23T00:00:00","2026-06-24T00:00:00","2026-06-25T00:00:00","2026-06-26T00:00:00","2026-06-29T00:00:00","2026-06-30T00:00:00","2026-07-01T00:00:00","2026-07-02T00:00:00","2026-07-03T00:00:00","2026-07-06T00:00:00","2026-07-07T00:00:00","2026-07-08T00:00:00","2026-07-09T00:00:00","2026-07-10T00:00:00","2026-07-13T00:00:00","2026-07-14T00:00:00","2026-07-15T00:00:00","2026-07-16T00:00:00","2026-07-17T00:00:00","2026-07-20T00:00:00","2026-07-21T00:00:00","2026-07-22T00:00:00","2026-07-23T00:00:00","2026-07-24T00:00:00","2026-07-27T00:00:00","2026-07-28T00:00:00","2026-07-29T00:00:00","2026-07-30T00:00:00","2026-07-31T00:00:00","2026-08-03T00:00:00","2026-08-04T00:00:00","2026-08-05T00:00:00","2026-08-06T00:00:00","2026-08-07T00:00:00","2026-08-10T00:00:00","2026-08-11T00:00:00","2026-08-12T00:00:00","2026-08-13T00:00:00","2026-08-14T00:00:00","2026-08-17T00:00:00","2026-08-18T00:00:00","2026-08-19T00:00:00","2026-08-20T00:00:00","2026-08-21T00:00:00","2026-08-24T00:00:00","2026-08-25T00:00:00","2026-08-26T00:00:00","2026-08-27T00:00:00","2026-08-28T00:00:00","2026-08-31T00:00:00","2026-09-01T00:00:00","2026-09-02T00:00:00","2026-09-03T00:00:00","2026-09-04T00:00:00","2026-09-07T00:00:00","2026-09-08T00:00:00","2026-09-09T00:00:00","2026-09-10T00:00:00","2026-09-11T00:00:00","2026-09-14T00:00:00","2026-09-15T00:00:00","2026-09-16T00:00:00","2026-09-17T00:00:00","2026-09-18T00:00:00","2026-09-21T00:00:00","2026-09-22T00:00:00","2026-09-23T00:00:00","2026-09-24T00:00:00","2026-09-25T00:00:00","2026-09-28T00:00:00","2026-09-29T00:00:00","2026-09-30T00:00:00","2026-10-01T00:00:00","2026-10-02T00:00:00","2026-10-05T00:00:00","2026-10-06T00:00:00","2026-10-07T00:00:00","2026-10-08T00:00:00","2026-10-09T00:00:00","2026-10-12T00:00:00","2026-10-13T00:00:00","2026-10-14T00:00:00","2026-10-15T00:00:00","2026-10-16T00:00:00","2026-10-19T00:00:00","2026-10-20T00:00:00","2026-10-21T00:00:00","2026-10-22T00:00:00","2026-10-23T00:00:00","2026-10-26T00:00:00","2026-10-27T00:00:00","2026-10-28T00:00:00","2026-10-29T00:00:00","2026-10-30T00:00:00","2026-11-02T00:00:00","2026-11-03T00:00:00","2026-11-04T00:00:00","2026-11-05T00:00:00","2026-11-06T00:00:00","2026-11-09T00:00:00","2026-11-10T00:00:00","2026-11-11T00:00:00","2026-11-12T00:00:00","2026-11-13T00:00:00","2026-11-16T00:00:00","2026-11-17T00:00:00","2026-11-18T00:00:00","2026-11-19T00:00:00","2026-11-20T00:00:00","2026-11-23T00:00:00","2026-11-24T00:00:00","2026-11-25T00:00:00","2026-11-26T00:00:00"],"y":{"dtype":"f8","bdata":"UrgehetR8L8pXI\u002fC9Sjwv+xRuB6F6\u002fG\u002fzczMzMzM8L8fhetRuB7xv2ZmZmZmZu6\u002fexSuR+F68L9xPQrXo3Dtv4\u002fC9Shcj+q\u002fFK5H4XoU7r9SuB6F61Hwvylcj8L1KPC\u002fzczMzMzM8L9I4XoUrkfxv65H4XoUrvO\u002fuB6F61G48r8AAAAAAADwvwAAAAAAAPC\u002fhetRuB6F6797FK5H4Xrsv1K4HoXrUfC\u002fPQrXo3A98r89CtejcD3yvz0K16NwPfK\u002f7FG4HoXr8b9xPQrXo3Dxv2ZmZmZmZvK\u002fcT0K16Nw8b\u002fsUbgehevxv4\u002fC9Shcj\u002fK\u002fcT0K16Nw8b\u002fsUbgehevxvz0K16NwPfK\u002f16NwPQrX678fhetRuB7tv3E9CtejcPG\u002fuB6F61G48r9cj8L1KFzzv3E9CtejcPG\u002fzczMzMzM8L\u002fhehSuR+Hqv7gehetRuOa\u002frkfhehSu57\u002fD9Shcj8Lxv0jhehSuR\u002fG\u002fUrgehetR8L\u002fD9Shcj8Lxvz0K16NwPfK\u002f7FG4HoXr8b9cj8L1KFzzv1yPwvUoXPO\u002f16NwPQrX87\u002fXo3A9Ctfzv3sUrkfhevS\u002fzczMzMzM9L8AAAAAAAD0v2ZmZmZmZvK\u002fXI\u002fC9Shc8797FK5H4Xr0vzMzMzMzM\u002fO\u002fuB6F61G48r\u002fXo3A9Ctfzvylcj8L1KPS\u002fcT0K16Nw9b\u002fD9Shcj8L1v1yPwvUoXPe\u002fj8L1KFyP9r9xPQrXo3D1v7gehetRuPa\u002fhetRuB6F97\u002fXo3A9Ctf3v1K4HoXrUfi\u002fmpmZmZmZ+b9I4XoUrkf5v83MzMzMzPi\u002f9ihcj8L1+L9xPQrXo3D5vx+F61G4Hvm\u002f4XoUrkfh+r\u002fhehSuR+H6vwrXo3A9Cvu\u002fw\u002fUoXI\u002fC\u002fb9mZmZmZmb+v7gehetRuP6\u002frkfhehSu\u002f7+F61G4HoX\u002fvylcj8L1KADAAAAAAAAAAMBmZmZmZmYAwEjhehSuRwHACtejcD0KAcAfhetRuB4BwGZmZmZmZgDAexSuR+F6AMB7FK5H4XoAwK5H4XoUrv+\u002fhetRuB6F\u002f78pXI\u002fC9Sj8v3sUrkfhevy\u002fzczMzMzM\u002fL\u002fXo3A9Ctf7v\u002fYoXI\u002fC9fy\u002fzczMzMzM+L9xPQrXo3D5v3E9CtejcPm\u002fcT0K16Nw+b+F61G4HoX7v8P1KFyPwvm\u002fhetRuB6F979mZmZmZmb2v0jhehSuR\u002fW\u002f16NwPQrX878fhetRuB7xv3E9CtejcO2\u002fmpmZmZmZ8b\u002f2KFyPwvX0v1yPwvUoXPe\u002fhetRuB6F97\u002f2KFyPwvX4v83MzMzMzPS\u002fCtejcD0K87+4HoXrUbjyvwrXo3A9Cu+\u002f7FG4HoXr4b9xPQrXo3DlvwAAAAAAAPC\u002fAAAAAAAA6L8zMzMzMzPrvw=="},"type":"scatter","xaxis":"x","yaxis":"y2"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,0.94],"title":{"text":"日期 (Date)"},"gridcolor":"#1e293b","showgrid":true},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"\u003cb\u003e股市大盤指數 (Points)\u003c\u002fb\u003e","font":{"color":"#38bdf8"}},"gridcolor":"#1e293b","showgrid":true},"yaxis2":{"anchor":"x","overlaying":"y","side":"right","title":{"text":"\u003cb\u003e殖利率 \u002f 盈餘殖利率 \u002f ERP 溢酬 (%)\u003c\u002fb\u003e","font":{"color":"#f43f5e"}},"gridcolor":"#334155","showgrid":false},"shapes":[{"line":{"color":"#94a3b8","dash":"dot","width":1.5},"type":"line","x0":0,"x1":1,"xref":"x domain","y0":0.0,"y1":0.0,"yref":"y2"}],"annotations":[{"font":{"color":"#cbd5e1","size":12},"showarrow":false,"text":"ERP=0% 股債倒掛臨界點","x":1,"xanchor":"right","xref":"x domain","y":0.0,"yanchor":"top","yref":"y"}],"title":{"font":{"size":20,"color":"#f8fafc","family":"Microsoft JhengHei"},"text":"\u003cb\u003e🐻 DualBear 台美股總體經濟、美債與去估值戰略全景圖\u003c\u002fb\u003e"},"hoverlabel":{"font":{"color":"#ffffff","size":13,"family":"Microsoft JhengHei"},"bgcolor":"rgba(15, 23, 42, 0.95)","bordercolor":"#38bdf8","namelength":-1},"font":{"color":"#cbd5e1"},"margin":{"t":70,"b":50,"l":70,"r":80},"hovermode":"x unified","showlegend":false,"paper_bgcolor":"#0b0f19","plot_bgcolor":"#111827","height":720},                        {"responsive": true}                    )                };            </script>        </div>
+  </div>
+
+  <!-- ERP 專業戰略說明沉浸式常駐卡片 (位於圖表下方，免開彈窗直覺閱讀) -->
+  <div class="macro-guide-card">
+    <div class="macro-guide-header">
+      <h5 class="fw-bold text-info mb-0">
+        🏛️ 華爾街量化核心：為什麼股對債 ERP 減的是 10Y 美債，而不是 3M 或 1Y？
+      </h5>
+    </div>
+    <div class="macro-guide-body p-4">
+      <p class="text-secondary mb-3">
+        在全球頂級投行（高盛、大摩、橋水）的資產配置架構中，<strong>股權風險溢酬 (ERP, Equity Risk Premium)</strong> 的標準公式永遠錨定 <strong>10 年期美國公債 (^TNX)</strong>，而非短期國債，其背後有三大不可撼動的金融經濟學邏輯：
+      </p>
+
+      <div class="formula-box">
+        <strong>Fed Model 經典定價公式：</strong><br>
+        ERP = 股票盈餘殖利率 (1 / PE) - 10 年期公債殖利率 (^TNX)<br>
+        <span class="text-warning">※ 當 ERP &lt; 0 時（如當前負值倒掛），稱為「股權溢酬倒掛」：承擔股票虧損風險，賺得竟比無風險公債還少！</span>
+      </div>
+
+      <div class="point-card" style="border-left-color: #38bdf8;">
+        <div class="point-title">1. ⏳ 存續期間與現金流的生命週期匹配 (Duration Matching)</div>
+        <p class="point-desc">
+          • <strong>股票是「永續資產」</strong>：投資指數（那指或台股加權），買的是企業未來 10 年、20 年甚至更長遠的現金流貼現，股票的隱含存續期間 (Duration) 通常在 <strong>15 ~ 25 年</strong> 左右。<br>
+          • <strong>3M / 1Y 是「短命資產」</strong>：數月後即到期，面臨巨大的再投資利率風險。<br>
+          • <strong>10Y 是長線巨資的定價之錨</strong>：主權基金、壽險與退休基金資金鎖定週期長達數年，核心考量是：「<em>把資金鎖進 10 年美債可無風險年領 4.8%~5.0% 達十年；若要去冒大跌風險投資股票十年，股票盈餘殖利率能給超過無風險美債嗎？</em>」
+        </p>
+      </div>
+
+      <div class="point-card" style="border-left-color: #f43f5e;">
+        <div class="point-title">2. 🏛️ 排除聯準會短期升降息雜音，反映真實長期資本成本</div>
+        <p class="point-desc">
+          • <strong>3M / 1Y 受政策短期直接操控</strong>：短債利率本質上就是聯邦基金利率，降息循環啟動時會在幾個月內劇烈變動，若拿它計算，ERP 會因聯準會主席一句話而劇烈失真。<br>
+          • <strong>10Y 公債是自由市場千億資金搏殺定價</strong>：反映市場對「長期實質成長 + 長期通膨」的客觀定價，是全球公認的<strong>「真實資本成本 (Cost of Capital)」</strong>。
+        </p>
+      </div>
+
+      <div class="point-card" style="border-left-color: #4ade80;">
+        <div class="point-title">3. 🎯 華爾街 Fed Model 經典判斷標準</div>
+        <p class="point-desc">
+          • <strong>ERP &gt; 2% ~ 3% (合理/便宜)</strong>：股市實質獲利回報顯著高於無風險利率，資金蜂擁進場推升股市。<br>
+          • <strong>ERP &lt; 0% (極度昂貴/倒掛)</strong>：股票性價比極低，機構法人必然啟動<strong>「去估值提款賣股、資金大搬家轉進美債」</strong>，這正是台美雙市場當前回檔去估值的核心推動力！
+        </p>
+      </div>
+
+      <div class="point-card" style="border-left-color: #fb923c;">
+        <div class="point-title">💡 補充：那 3M 短債在系統中的戰略功能是什麼？</div>
+        <p class="point-desc">
+          • <strong>3M 短債 (^IRX)</strong>：專職用來監測<strong>「殖利率曲線倒掛 (10Y - 3M)」</strong>，是半世紀以來預測美國實體經濟衰退準確率逾 90% 的宏觀雷達。<br>
+          • <strong>10Y 美債 (^TNX)</strong>：專職擔任<strong>「全球各類資產的去估值定價尺規」</strong>。<br>
+          兩者各司其職、雙維兼具，建構起 SmartVest 完整的宏觀量化視野！
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY_STATES = 'smartvest_macro_trace_states';
+    const STORAGE_KEY_BTN = 'smartvest_macro_active_btn';
+
+    function getPlotlyDiv() {
+      return document.getElementsByClassName('plotly-graph-div')[0];
+    }
+
+    function saveState(activeBtnId) {
+      try {
+        const states = [];
+        for (let i = 0; i < 9; i++) {
+          const chk = document.getElementById('chk_trace_' + i);
+          states.push(chk ? chk.checked : true);
+        }
+        localStorage.setItem(STORAGE_KEY_STATES, JSON.stringify(states));
+        if (activeBtnId) {
+          localStorage.setItem(STORAGE_KEY_BTN, activeBtnId);
+        } else {
+          localStorage.removeItem(STORAGE_KEY_BTN);
+        }
+      } catch (e) {
+        console.warn('localStorage access failed:', e);
+      }
+    }
+
+    function toggleTrace(traceIndex, isVisible) {
+      const pDiv = getPlotlyDiv();
+      if (!pDiv) return;
+      Plotly.restyle(pDiv, { visible: isVisible ? true : false }, [traceIndex]);
+      // 取消快捷按鈕高亮並儲存自訂狀態
+      document.querySelectorAll('.btn-quick').forEach(b => b.classList.remove('active'));
+      saveState(null);
+    }
+
+    function setPreset(states, btnElement) {
+      const pDiv = getPlotlyDiv();
+      if (!pDiv) return;
+
+      let btnId = null;
+      if (btnElement) {
+        document.querySelectorAll('.btn-quick').forEach(b => b.classList.remove('active'));
+        btnElement.classList.add('active');
+        btnId = btnElement.id;
+      }
+
+      for (let i = 0; i < states.length; i++) {
+        const chk = document.getElementById('chk_trace_' + i);
+        if (chk) chk.checked = states[i];
+        Plotly.restyle(pDiv, { visible: states[i] ? true : false }, [i]);
+      }
+      saveState(btnId);
+    }
+
+    // 頁面載入時自動恢復使用者的記憶設定
+    function restoreState() {
+      const pDiv = getPlotlyDiv();
+      if (!pDiv) return;
+
+      try {
+        const savedStates = localStorage.getItem(STORAGE_KEY_STATES);
+        const savedBtn = localStorage.getItem(STORAGE_KEY_BTN);
+
+        if (savedStates) {
+          const states = JSON.parse(savedStates);
+          document.querySelectorAll('.btn-quick').forEach(b => b.classList.remove('active'));
+          if (savedBtn) {
+            const btn = document.getElementById(savedBtn);
+            if (btn) btn.classList.add('active');
+          }
+
+          for (let i = 0; i < states.length; i++) {
+            const chk = document.getElementById('chk_trace_' + i);
+            if (chk) chk.checked = states[i];
+            Plotly.restyle(pDiv, { visible: states[i] ? true : false }, [i]);
+          }
+        }
+      } catch (e) {
+        console.warn('Restore state failed:', e);
+      }
+    }
+
+    // 等候 Plotly 渲染完畢後自動還原偏好
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(restoreState, 200);
+    });
+  </script>
+</body>
+</html>

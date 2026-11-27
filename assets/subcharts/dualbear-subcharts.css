@@ -1,0 +1,367 @@
+/* ══════════════════════════════════════════════════════════════════
+   DualBear SubCharts Hub — 通用量化副圖基座樣式庫 v2.8
+   標準規範：100% 繼承 ZenGrid chart-block 視覺規範、嚴格對齊 22px 控制項
+   ══════════════════════════════════════════════════════════════════ */
+
+.subchart-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  background: #14161b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  padding: 6px 8px 4px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.subchart-block.is-collapsed {
+  opacity: 0.72;
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.subchart-block.is-collapsed .subchart-collapsible-area {
+  display: none !important;
+}
+
+.subchart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 24px;
+}
+
+.subchart-title-wrap {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.3;
+}
+
+.subchart-title {
+  color: #ffffff;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.subchart-status-badge {
+  font-size: 11px;
+  font-family: monospace;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 600;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.subchart-status-badge.badge-bull {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.subchart-status-badge.badge-bear {
+  background: rgba(244, 63, 94, 0.15);
+  color: #f43f5e;
+  border-color: rgba(244, 63, 94, 0.35);
+}
+
+.subchart-status-badge.badge-warn {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.subchart-status-badge.badge-wait {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  border-color: rgba(148, 163, 184, 0.35);
+}
+
+.subchart-btn-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
+
+/* 🎯 與 ZenGrid .chart-action-btn 100% 相同規格 (22px 高度、緊湊精緻) */
+.subchart-btn {
+  background: #252830;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e2e8f0;
+  border-radius: 3px;
+  padding: 0 7px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1.2;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  min-height: 22px;
+  max-height: 22px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.subchart-btn:hover:not(:disabled) {
+  background: #0e639c;
+  border-color: #38bdf8;
+  color: #ffffff;
+}
+
+.subchart-btn.is-active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #38bdf8;
+}
+
+/* 3 組市場切換群組與按鈕膠囊 (嚴格 22px 統一高度、文字完美垂直置中) */
+.subchart-market-group {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #334155;
+  border-radius: 3px;
+  overflow: hidden;
+  height: 22px;
+  min-height: 22px;
+  max-height: 22px;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+.subchart-market-btn {
+  background: #1e222b;
+  border: none;
+  border-right: 1px solid #334155;
+  color: #38bdf8;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0 8px;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  transition: all 0.15s ease;
+  height: 22px;
+  min-height: 22px;
+  max-height: 22px;
+  line-height: 1;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.subchart-market-btn:last-child {
+  border-right: none;
+}
+
+.subchart-market-btn:hover:not(.is-active) {
+  background: #28303d;
+  color: #ffffff;
+}
+
+.subchart-market-btn.is-active {
+  background: #0284c7;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.subchart-market-prefix {
+  font-size: 9.5px;
+  font-weight: 800;
+  opacity: 0.9;
+  line-height: 1;
+}
+
+/* 🎯 預警 / 確立雙分段按鈕群組 (與市場切換群組 100% 統一蔚藍色系，視覺整齊和諧) */
+.subchart-signal-mode-group {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #334155;
+  border-radius: 3px;
+  overflow: hidden;
+  height: 22px;
+  min-height: 22px;
+  max-height: 22px;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+.subchart-signal-mode-btn {
+  background: #1e222b;
+  border: none;
+  border-right: 1px solid #334155;
+  color: #38bdf8;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0 10px;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  height: 22px;
+  min-height: 22px;
+  max-height: 22px;
+  line-height: 1;
+  box-sizing: border-box;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.subchart-signal-mode-btn:last-child {
+  border-right: none;
+}
+
+.subchart-signal-mode-btn:hover:not(.is-active) {
+  background: #28303d;
+  color: #ffffff;
+}
+
+.subchart-signal-mode-btn.is-active {
+  background: #0284c7;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.subchart-btn:disabled,
+.subchart-btn.btn-disabled {
+  opacity: 0.25 !important;
+  color: #64748b !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  background: #181a1f !important;
+}
+
+.subchart-legend-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 4px 6px;
+  background-color: transparent;
+  font-size: 11px;
+  color: #94a3b8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.subchart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.subchart-legend-bull { color: #f43f5e; }
+.subchart-legend-bear { color: #10b981; }
+.subchart-legend-sup-trigger { color: #38bdf8; font-weight: 600; }
+.subchart-legend-sup-hold { color: rgba(56, 189, 248, 0.85); }
+.subchart-legend-res-trigger { color: #f59e0b; font-weight: 600; }
+.subchart-legend-res-hold { color: rgba(245, 158, 11, 0.85); }
+.subchart-legend-tier { color: #38bdf8; }
+.subchart-legend-bias { color: #f43f5e; }
+.subchart-legend-tierline { color: #94a3b8; font-family: monospace; }
+
+/* 🎯 雙熊規格：副圖畫布外層容器 (消除邊界 padding，改由 Canvas 內部精確對齊) */
+.subchart-canvas-box {
+  position: relative;
+  width: 100%;
+  background-color: #0b0f19;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+#dbSubCanvasBox {
+  height: 185px;
+}
+
+#dbBiasCanvasBox {
+  height: 205px;
+}
+
+/* 🎯 可視化水平拖曳調整手柄 (Resizer Bar) */
+.subchart-resizer-bar {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  cursor: row-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  touch-action: none;
+  background-color: #14161b;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 2px;
+  transition: background-color 0.15s ease;
+}
+
+.subchart-resizer-bar:hover {
+  background-color: rgba(56, 189, 248, 0.1);
+}
+
+.subchart-resizer-bar:hover .subchart-resizer-handle {
+  background-color: #38bdf8;
+  width: 64px;
+}
+
+.subchart-resizer-handle {
+  width: 42px;
+  height: 4px;
+  background-color: #475569;
+  border-radius: 2px;
+  transition: background-color 0.15s ease, width 0.15s ease;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   方案 A：大週期乖離率副圖 — 階梯百分比浮動標籤層
+   左軸隱藏後由 DOM 承接 0/20/50/85/100% 標籤，達成各圖有效繪圖區寬度完全一致。
+   autoscaleInfoProvider 鎖定 0~100，故刻度位置可用固定百分比表示，無需 JS 動態算座標。
+   ══════════════════════════════════════════════════════════════════ */
+.subchart-bias-float-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 28px; /* 避開 LWC 時間軸帶（實測 28px） */
+  pointer-events: none;
+  z-index: 5;
+}
+
+.subchart-bias-tier-label {
+  position: absolute;
+  left: 2px;
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 15px;
+  padding: 0 4px;
+  border-radius: 2px;
+  background: rgba(11, 15, 25, 0.88);
+  border: 1px solid currentColor;
+  white-space: nowrap;
+}
+
+.subchart-bias-tier-label.tier-100 { top: 0%;   color: #f87171; transform: translateY(0); }
+.subchart-bias-tier-label.tier-85  { top: 15%;  color: #fbbf24; transform: translateY(-50%); }
+.subchart-bias-tier-label.tier-50  { top: 50%;  color: #38bdf8; transform: translateY(-50%); }
+.subchart-bias-tier-label.tier-20  { top: 80%;  color: #c084fc; transform: translateY(-50%); }
+.subchart-bias-tier-label.tier-0   { top: 100%; color: #94a3b8; transform: translateY(-100%); }

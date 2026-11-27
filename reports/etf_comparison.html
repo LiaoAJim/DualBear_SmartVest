@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>台股高股息 ETF 與 0050 ｜ 同期含息報酬比較</title>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0A0F1D;
+      --card-bg: #131B2E;
+      --border-color: #1E293B;
+      --text-main: #F8FAFC;
+      --text-muted: #CBD5E1;
+      --text-sub: #94A3B8;
+      --accent-blue: #38BDF8;
+      --accent-amber: #F59E0B;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif;
+      padding: 24px 32px 48px;
+    }
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .header-title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .header-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #FFFFFF;
+    }
+    .header-mode-badge {
+      font-size: 13px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+    .mode-badge-drop {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38BDF8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+    }
+    .mode-badge-rise {
+      background: rgba(245, 158, 11, 0.15);
+      color: #F59E0B;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+    .header-badge {
+      background: rgba(148, 163, 184, 0.15);
+      color: var(--text-muted);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      font-size: 13px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .header-subtitle {
+      color: var(--text-muted);
+      font-size: 13.5px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    
+    /* 模式切換按鈕膠囊組 */
+    .mode-switcher {
+      display: flex;
+      align-items: center;
+      background: #0F172A;
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      gap: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    .mode-btn {
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .mode-btn:hover {
+      color: #FFF;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .mode-btn.active.drop {
+      background: #0284C7;
+      color: #FFF;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+    }
+    .mode-btn.active.rise {
+      background: #D97706;
+      color: #FFF;
+      box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4);
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 16px 14px 32px;
+      }
+      .header-title {
+        font-size: 20px;
+      }
+      .mode-switcher {
+        width: 100%;
+      }
+      .mode-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 10px;
+        font-size: 13px;
+      }
+    }
+
+    .cards-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: transform 0.15s ease, border-color 0.2s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+    }
+    .card-ticker {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .card-name {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-return {
+      font-size: 24px;
+      font-weight: 800;
+      margin: 6px 0 2px 0;
+      letter-spacing: -0.5px;
+    }
+    .ret-pos { color: #FB7185; }
+    .ret-neg { color: #38BDF8; }
+    .card-diff {
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+    .diff-better { color: #34D399; }
+    .diff-worse { color: #FB7185; }
+    .diff-bench { color: var(--text-muted); }
+
+    .chart-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px 16px 10px 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+    #chart {
+      width: 100%;
+      height: 580px;
+      min-height: 460px;
+    }
+    @media (max-width: 640px) {
+      .chart-container {
+        padding: 10px 4px 6px 4px;
+      }
+      #chart {
+        height: auto;
+      }
+    }
+    .footer-note {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #94A3B8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-bar">
+    <div class="header-left">
+      <div class="header-title-row">
+        <span class="header-title" id="page-title">台股五大高股息 ETF 與 0050 ｜ 同期含息報酬比較</span>
+        <span class="header-mode-badge" id="mode-badge">載入中...</span>
+        <span class="header-badge">累積含息總報酬</span>
+      </div>
+      <div class="header-subtitle" id="header-subtitle">
+        <!-- 動態注入統計區間與交易日 -->
+      </div>
+    </div>
+
+    <!-- 模式切換按鈕膠囊組 -->
+    <div class="mode-switcher">
+      <button id="btn-drop" class="mode-btn" onclick="switchMode('drop')">
+        <span>📉</span> 跌幅抗跌
+      </button>
+      <button id="btn-rise" class="mode-btn" onclick="switchMode('rise')">
+        <span>📈</span> 漲幅進攻
+      </button>
+    </div>
+  </div>
+
+  <!-- 頂部即時績效指標卡 -->
+  <div class="cards-row" id="cards-container">
+    <!-- 動態生成標的卡片 -->
+  </div>
+
+  <!-- 主 Plotly 互動圖表 -->
+  <div class="chart-container">
+    <div id="chart"></div>
+  </div>
+
+  <div class="footer-note">
+    <span>資料來源：臺灣證券交易所每日還原收盤價。假設配息於除息日收盤全數再投入，未扣個人稅費。</span>
+    <span>DualBear SmartVest Quant Studio ｜ 自動感應切換架構</span>
+  </div>
+
+  <script>
+    const appData = {"drop": {"mode": "drop", "mode_title": "同期跌幅抗跌比較", "mode_badge": "📉 空頭抗跌", "event_note": " (0050 於 2026-10-29 跌破 60MA)", "benchmark": "0050", "bench_return": -14.956281428242303, "start_date": "2026-10-28", "end_date": "2026-11-27", "trading_days": 23, "traces": [{"x": ["2026-10-28", "2026-10-29", "2026-10-30", "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06", "2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "y": [0.0, -0.6113537117903967, -2.4454175124522415, -2.6200873362445365, -6.462883428715205, -7.336245874130054, -9.956333210374591, -12.820960965219019, -9.606986899563319, -8.646289542252317, -7.1615693871110775, -8.558954630356164, -7.423580786026196, -11.615723189308136, -12.803496648130464, -13.572053201333922, -17.187773192293253, -22.602617688574643, -20.698687291041207, -12.76856135072666, -20.244541751245226, -17.04803200267808, -17.956329745496724], "mode": "lines", "name": "0056 元大高股息", "ticker": "0056", "line": {"color": "#34D399", "width": 2.5, "dash": "solid"}, "hovertemplate": "<b>0056 元大高股息</b><br>日期: %{x}<br>累積含息報酬: %{y:.2f}%<extra></extra>"}, {"x": ["2026-10-28", "2026-10-29", "2026-10-30", "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06", "2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "y": [0.0, -0.9817671809256745, -2.356237382072879, -2.384293865187803, -4.992990373394768, -5.722298428186356, -7.34923203563288, -10.26648030541889, -8.078540090424479, -7.573630398486808, -6.030855539971947, -7.433380084151464, -5.750354911301281, -12.538568568931884, -13.43618342117373, -14.025246511836542, -16.46563622259324, -21.374472127221576, -21.31837521161136, -13.576439085715608, -19.77559500288997, -17.194949627591384, -17.924263032589515], "mode": "lines", "name": "00878 國泰永續高股息", "ticker": "00878", "line": {"color": "#F97316", "width": 2.5, "dash": "solid"}, "hovertemplate": "<b>00878 國泰永續高股息</b><br>日期: %{x}<br>累積含息報酬: %{y:.2f}%<extra></extra>"}, {"x": ["2026-10-28", "2026-10-29", "2026-10-30", "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06", "2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "y": [0.0, -0.09118541033434902, -0.9422487763285914, -1.2765971360597872, -3.586628226886035, -4.9848017359214625, -5.197566765782313, -8.389059605931791, -5.835867652777116, -6.079028515105545, -5.106385065791807, -5.927049352767611, -4.16413165153341, -7.294832826747721, -7.629181186478906, -8.844985498121083, -11.39817745127576, -16.44376969264996, -17.568386506889368, -10.334346504559267, -15.288751248530696, -12.401216733057085, -12.705169260320693], "mode": "lines", "name": "00919 群益台灣精選高息", "ticker": "00919", "line": {"color": "#A78BFA", "width": 2.5, "dash": "solid"}, "hovertemplate": "<b>00919 群益台灣精選高息</b><br>日期: %{x}<br>累積含息報酬: %{y:.2f}%<extra></extra>"}, {"x": ["2026-10-28", "2026-10-29", "2026-10-30", "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06", "2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "y": [0.0, -0.4017216642754673, -1.2625542398504774, -1.6929746871357176, -3.9311347425069587, -4.849354813738572, -5.997135375801433, -9.038735256988662, -6.8579653243252325, -6.226684920586001, -4.964135059154195, -6.1119046751703765, -5.193684603938764, -8.005734940341425, -8.493545510334478, -9.58393047666618, -12.19512085661485, -17.3314219054738, -17.15925153735036, -9.95696080124362, -15.55236641269504, -13.055956278161995, -13.400286068362178], "mode": "lines", "name": "00918 大華優利高填息30", "ticker": "00918", "line": {"color": "#38BDF8", "width": 2.5, "dash": "solid"}, "hovertemplate": "<b>00918 大華優利高填息30</b><br>日期: %{x}<br>累積含息報酬: %{y:.2f}%<extra></extra>"}, {"x": ["2026-10-28", "2026-10-29", "2026-10-30", "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06", "2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "y": [0.0, -1.9554030874785577, -5.077186702250613, -5.3173228766047025, -9.022296885887915, -10.017154229034887, -13.756434340828683, -16.706687181319012, -13.687822135807515, -13.07032537705698, -11.423671715868888, -13.516298166474582, -12.41852251579585, -18.132847414621967, -19.348198185654077, -19.039449806278807, -22.710117713051424, -27.718697444856875, -25.52315922993943, -18.353347385727105, -24.52830188679245, -20.85763398001983, -21.475130738770364], "mode": "lines", "name": "00929 復華台灣科技優息", "ticker": "00929", "line": {"color": "#F43F5E", "width": 2.5, "dash": "solid"}, "hovertemplate": "<b>00929 復華台灣科技優息</b><br>日期: %{x}<br>累積含息報酬: %{y:.2f}%<extra></extra>"}, {"x": ["2026-10-28", "2026-10-29", "2026-10-30", "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06", "2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "y": [0.0, -1.2885425736008371, -3.405434446087341, -4.187761608704688, -7.409114531710714, -8.099404443783442, -10.584445318448399, -14.864244177697694, -10.308333566814575, -8.237463830596404, -5.0161109075903765, -7.086980643808538, -5.66037868339474, -11.228720116244862, -13.48366435355225, -13.391627103007641, -16.981136050184208, -22.27335870940841, -19.926370199564314, -11.91901002831759, -16.88909177764749, -14.542110289795506, -14.956281428242303], "mode": "lines", "name": "0050 元大台灣50", "ticker": "0050", "line": {"color": "#FBBF24", "width": 3, "dash": "dash"}, "hovertemplate": "<b>0050 元大台灣50</b><br>日期: %{x}<br>累積含息報酬: %{y:.2f}%<extra></extra>"}], "cards": [{"ticker": "0056", "name": "元大高股息", "color": "#34D399", "return_val": -17.956329745496724, "return_str": "-17.96%", "return_class": "ret-neg", "diff_text": "多跌 3.00 個百分點", "diff_class": "diff-worse", "is_benchmark": false}, {"ticker": "00878", "name": "國泰永續高股息", "color": "#F97316", "return_val": -17.924263032589515, "return_str": "-17.92%", "return_class": "ret-neg", "diff_text": "多跌 2.97 個百分點", "diff_class": "diff-worse", "is_benchmark": false}, {"ticker": "00919", "name": "群益台灣精選高息", "color": "#A78BFA", "return_val": -12.705169260320693, "return_str": "-12.71%", "return_class": "ret-neg", "diff_text": "少跌 2.25 個百分點", "diff_class": "diff-better", "is_benchmark": false}, {"ticker": "00918", "name": "大華優利高填息30", "color": "#38BDF8", "return_val": -13.400286068362178, "return_str": "-13.40%", "return_class": "ret-neg", "diff_text": "少跌 1.56 個百分點", "diff_class": "diff-better", "is_benchmark": false}, {"ticker": "00929", "name": "復華台灣科技優息", "color": "#F43F5E", "return_val": -21.475130738770364, "return_str": "-21.48%", "return_class": "ret-neg", "diff_text": "多跌 6.52 個百分點", "diff_class": "diff-worse", "is_benchmark": false}, {"ticker": "0050", "name": "元大台灣50", "color": "#FBBF24", "return_val": -14.956281428242303, "return_str": "-14.96%", "return_class": "ret-neg", "diff_text": "市值型比較基準", "diff_class": "diff-bench", "is_benchmark": true}]}, "rise": {"mode": "rise", "mode_title": "同期漲幅進攻力比較", "mode_badge": "📈 多頭進攻", "event_note": " (0050 於 2026-10-28 突破 60MA)", "benchmark": "0050", "bench_return": -13.320822843810332, "start_date": "2026-10-27", "end_date": "2026-11-27", "trading_days": 24, "traces": [{"x": ["2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30", "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06", "2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "y": [0.0, 1.2378426171529622, 0.6189213085764811, -1.237845315435726, -1.4146772767462346, -5.305041136939792, -6.189214434906187, -8.841734328805394, -11.741821666822084, -8.48806366047745, -7.515474381855791, -6.012375727888752, -7.4270584012005365, -6.2776304155614415, -10.521664944082943, -11.724141168973802, -12.502211242729743, -16.16268815665409, -21.644559905763007, -19.71706184636798, -11.68877342757032, -19.257294699536498, -16.021217191040137, -16.940758230410037], "mode": "lines", "name": "0056 元大高股息", "ticker": "0056", "line": {"color": "#34D399", "width": 2.5, "dash": "solid"}, "hovertemplate": "<b>0056 元大高股息</b><br>日期: %{x}<br>累積含息報酬: %{y:.2f}%<extra></extra>"}, {"x": ["2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30", "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06", "2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "y": [0.0, 0.7062146892655274, -0.28248587570621764, -1.666662787313511, -1.694917409433483, -4.322036915579752, -5.056495450984277, -6.694918702551201, -9.632769008140773, -7.429377237955725, -6.92090179960606, -5.36723163841808, -6.779661016949145, -5.084750073104249, -11.920903092723778, -12.82485703290519, -13.418080173643288, -15.87570427501268, -20.81920709987144, -20.762714019602967, -12.966103203552592, -19.2090384704245, -16.610168198407706, -17.344632121802718], "mode": "lines", "name": "00878 國泰永續高股息", "ticker": "00878", "line": {"color": "#F97316", "width": 2.5, "dash": "solid"}, "hovertemplate": "<b>00878 國泰永續高股息</b><br>日期: %{x}<br>累積含息報酬: %{y:.2f}%<extra></extra>"}, {"x": ["2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30", "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06", "2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "y": [0.0, 0.45801526717557106, 0.3664122137404524, -0.4885491524033836, -0.8244288786677045, -3.1450402645664344, -4.549617621734847, -4.76335714791567, -7.969467512523853, -5.404581550423426, -5.648856126625123, -4.671757821818345, -5.496180876520751, -3.7251887430671538, -6.870229007633588, -7.2061087338978975, -8.427481614906373, -10.992367577006801, -16.061069401165906, -17.19083713211176, -9.92366412213741, -14.900760796233904, -12.000000931834442, -12.30534560807789], "mode": "lines", "name": "00919 群益台灣精選高息", "ticker": "00919", "line": {"color": "#A78BFA", "width": 2.5, "dash": "solid"}, "hovertemplate": "<b>00919 群益台灣精選高息</b><br>日期: %{x}<br>累積含息報酬: %{y:.2f}%<extra></extra>"}, {"x": ["2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30", "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06", "2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "y": [0.0, 0.02870264064294137, -0.3731343283582156, -1.23421398561393, -1.6647579749334063, -3.9035604413423464, -4.8220440659813235, -5.970154071374278, -9.0126269720452, -6.831231100824764, -6.199769502939789, -4.9368572563583175, -6.084956312562795, -5.166472687923818, -7.97933015702924, -8.46728074153722, -9.557978677147439, -12.169918537687362, -17.307693840578697, -17.135474055013212, -9.931116071278423, -15.528127711895012, -13.031001041732083, -13.375429663674577], "mode": "lines", "name": "00918 大華優利高填息30", "ticker": "00918", "line": {"color": "#38BDF8", "width": 2.5, "dash": "solid"}, "hovertemplate": "<b>00918 大華優利高填息30</b><br>日期: %{x}<br>累積含息報酬: %{y:.2f}%<extra></extra>"}, {"x": ["2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30", "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06", "2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "y": [0.0, 1.1801457827143258, -0.7983339118361688, -3.9569591242834212, -4.1999292555719325, -7.9486273593763475, -8.955225469502503, -12.738634537839511, -15.72370466280628, -12.66921260877435, -12.044428488067016, -10.37834191314051, -12.495664406550999, -11.384933402827112, -17.16669566595732, -18.396389347858943, -18.083997287505284, -21.797984426777127, -26.86567270106137, -24.644223934492683, -17.38979785817234, -23.637625824366538, -19.92363868509469, -20.548422805802012], "mode": "lines", "name": "00929 復華台灣科技優息", "ticker": "00929", "line": {"color": "#F43F5E", "width": 2.5, "dash": "solid"}, "hovertemplate": "<b>00929 復華台灣科技優息</b><br>日期: %{x}<br>累積含息報酬: %{y:.2f}%<extra></extra>"}, {"x": ["2026-10-27", "2026-10-28", "2026-10-29", "2026-10-30", "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05", "2026-11-06", "2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26", "2026-11-27"], "y": [0.0, 1.9230798134162175, 0.609757537695188, -1.547843855062958, -2.345215793419464, -5.628517904206721, -6.332082642232562, -8.864912836313344, -13.227015643479678, -8.583491235321372, -6.472797021243859, -3.189494910456603, -5.300189124534127, -3.8461524698018, -9.521577552689164, -11.819886167427995, -11.726078967097342, -15.384617036237834, -20.778613361102614, -18.386490389002507, -10.225142290715006, -15.290802678876558, -12.898686863807074, -13.320822843810332], "mode": "lines", "name": "0050 元大台灣50", "ticker": "0050", "line": {"color": "#FBBF24", "width": 3, "dash": "dash"}, "hovertemplate": "<b>0050 元大台灣50</b><br>日期: %{x}<br>累積含息報酬: %{y:.2f}%<extra></extra>"}], "cards": [{"ticker": "0056", "name": "元大高股息", "color": "#34D399", "return_val": -16.940758230410037, "return_str": "-16.94%", "return_class": "ret-neg", "diff_text": "落後 3.62 個百分點", "diff_class": "diff-worse", "is_benchmark": false}, {"ticker": "00878", "name": "國泰永續高股息", "color": "#F97316", "return_val": -17.344632121802718, "return_str": "-17.34%", "return_class": "ret-neg", "diff_text": "落後 4.02 個百分點", "diff_class": "diff-worse", "is_benchmark": false}, {"ticker": "00919", "name": "群益台灣精選高息", "color": "#A78BFA", "return_val": -12.30534560807789, "return_str": "-12.31%", "return_class": "ret-neg", "diff_text": "領先 +1.02 個百分點", "diff_class": "diff-better", "is_benchmark": false}, {"ticker": "00918", "name": "大華優利高填息30", "color": "#38BDF8", "return_val": -13.375429663674577, "return_str": "-13.38%", "return_class": "ret-neg", "diff_text": "落後 0.05 個百分點", "diff_class": "diff-worse", "is_benchmark": false}, {"ticker": "00929", "name": "復華台灣科技優息", "color": "#F43F5E", "return_val": -20.548422805802012, "return_str": "-20.55%", "return_class": "ret-neg", "diff_text": "落後 7.23 個百分點", "diff_class": "diff-worse", "is_benchmark": false}, {"ticker": "0050", "name": "元大台灣50", "color": "#FBBF24", "return_val": -13.320822843810332, "return_str": "-13.32%", "return_class": "ret-neg", "diff_text": "市值型比較基準", "diff_class": "diff-bench", "is_benchmark": true}]}, "default_mode": "drop"};
+    let currentMode = appData.default_mode || 'drop';
+
+    function renderView(mode) {
+      currentMode = mode;
+      const b = appData[mode];
+      if (!b) return;
+
+      // 1. 更新按鈕啟用狀態
+      const btnDrop = document.getElementById('btn-drop');
+      const btnRise = document.getElementById('btn-rise');
+      btnDrop.className = 'mode-btn' + (mode === 'drop' ? ' active drop' : '');
+      btnRise.className = 'mode-btn' + (mode === 'rise' ? ' active rise' : '');
+
+      // 2. 更新標題與 Badge
+      document.getElementById('page-title').innerText = `台股五大高股息 ETF 與 ${b.benchmark} ｜ ${b.mode_title}`;
+      const badge = document.getElementById('mode-badge');
+      badge.innerText = b.mode_badge;
+      badge.className = 'header-mode-badge ' + (mode === 'drop' ? 'mode-badge-drop' : 'mode-badge-rise');
+
+      // 3. 更新副標題
+      const subtitle = document.getElementById('header-subtitle');
+      subtitle.innerHTML = `
+        <span>📅 統計區間: ${b.start_date} 收盤至 ${b.end_date} 收盤</span>
+        <span>⏱️ 共 ${b.trading_days} 個交易日${b.event_note || ''}</span>
+        <span>🛡️ 基準起算: 所有 ETF 從同一天、同一基準 (0.00%) 起算</span>
+      `;
+
+      // 4. 更新卡片
+      const cardsContainer = document.getElementById('cards-container');
+      cardsContainer.innerHTML = b.cards.map(c => `
+        <div class="stat-card" style="border-top: 3px solid ${c.color};">
+          <div class="card-ticker" style="color: ${c.color};">${c.ticker}</div>
+          <div class="card-name">${c.name}</div>
+          <div class="card-return ${c.return_class}">${c.return_str}</div>
+          <div class="card-diff ${c.diff_class}">${c.diff_text}</div>
+        </div>
+      `).join('');
+
+      // 5. 更新 Plotly 折線圖
+      renderPlotlyChart(b);
+    }
+
+    function calculateOptimalChartHeight(traces, isMobile) {
+      // 1. 基於視窗高度動態計算 (全覽視窗 65vh)
+      const vhHeight = Math.round(window.innerHeight * 0.65);
+
+      // 2. 基於數據最大/最小震幅 (Range Spread) 動態擴展，確保極端大跌或大漲時垂直刻度舒展
+      let minY = 0, maxY = 0;
+      traces.forEach(tr => {
+        if (tr.y && tr.y.length > 0) {
+          tr.y.forEach(v => {
+            if (v < minY) minY = v;
+            if (v > maxY) maxY = v;
+          });
+        }
+      });
+      const spread = Math.abs(maxY - minY);
+      // 每 10% 震幅增加 40px，基礎高度 460px
+      const spreadHeight = Math.round(460 + (spread * 4.2));
+
+      // 3. 綜合兩者取最合適高度，並設定合理的防縮界限
+      const minBound = isMobile ? 480 : 560;
+      const maxBound = isMobile ? 680 : 820;
+      let targetHeight = Math.max(vhHeight, spreadHeight);
+      targetHeight = Math.min(Math.max(targetHeight, minBound), maxBound);
+
+      return targetHeight;
+    }
+
+    function renderPlotlyChart(b) {
+      const traces = b.traces;
+      const isMobile = window.innerWidth <= 640;
+      const isDesktopOrTablet = window.innerWidth > 640;
+      const optimalHeight = calculateOptimalChartHeight(traces, isMobile);
+
+      // 更新容器高度
+      document.getElementById('chart').style.height = `${optimalHeight}px`;
+
+      const layout = {
+        height: optimalHeight,
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: {
+          family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif',
+          color: '#E2E8F0'
+        },
+        hoverlabel: {
+          bgcolor: '#0F172A',
+          bordercolor: '#38BDF8',
+          font: {
+            family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif',
+            size: 13,
+            color: '#FFFFFF'
+          }
+        },
+        margin: isMobile 
+          ? { l: 42, r: 85, t: 25, b: 40 } 
+          : { l: 55, r: 140, t: 55, b: 50 },
+        hovermode: 'x unified',
+        xaxis: {
+          gridcolor: 'rgba(255, 255, 255, 0.08)',
+          linecolor: 'rgba(255, 255, 255, 0.25)',
+          tickfont: { color: '#CBD5E1', size: isMobile ? 10 : 12 },
+          tickformat: '%m/%d',
+          showspikes: true,
+          spikemode: 'across',
+          spikesnap: 'cursor',
+          spikedash: 'dot',
+          spikethickness: 1,
+          spikecolor: '#94A3B8',
+          fixedrange: false // 允許水平縮放拖曳
+        },
+        yaxis: {
+          title: {
+            text: isMobile ? '含息報酬 (%)' : '自起盤日起累積含息報酬 (%)',
+            font: { color: '#E2E8F0', size: isMobile ? 11 : 13 }
+          },
+          gridcolor: 'rgba(255, 255, 255, 0.1)',
+          linecolor: 'rgba(255, 255, 255, 0.25)',
+          tickfont: { color: '#CBD5E1', size: isMobile ? 10 : 12 },
+          ticksuffix: '%',
+          zerolinecolor: 'rgba(255, 255, 255, 0.45)',
+          zerolinewidth: 1.5,
+          automargin: true,
+          fixedrange: true // 物理級鎖定 Y 軸垂直拖曳！保證所有線條與波段永遠完全顯示，絕不被滑鼠拖掉
+        },
+        // 桌機/平板模式顯示水平頂部圖例，手機模式隱藏避免遮擋
+        showlegend: isDesktopOrTablet,
+        legend: {
+          orientation: 'h',
+          x: 0,
+          y: 1.12,
+          font: { size: 12, color: '#F8FAFC' },
+          bgcolor: 'rgba(0,0,0,0)'
+        }
+      };
+
+      // 右側端點數值標註（自動防重疊衝突分離算法）
+      const rawAnnotations = [];
+      traces.forEach(tr => {
+        if (tr.x && tr.x.length > 0) {
+          const lastX = tr.x[tr.x.length - 1];
+          const lastY = tr.y[tr.y.length - 1];
+          const ticker = tr.ticker || tr.name.split(' ')[0];
+          rawAnnotations.push({
+            x: lastX,
+            y: lastY,
+            originalY: lastY,
+            color: tr.line.color,
+            ticker: ticker,
+            text: isMobile 
+              ? `<b>${ticker}</b> ${lastY >= 0 ? '+' : ''}${lastY.toFixed(1)}%`
+              : `<b>${ticker}</b> ${lastY >= 0 ? '+' : ''}${lastY.toFixed(2)}%`,
+          });
+        }
+      });
+
+      // 依 Y 值由小到大排序並做碰撞排斥分離 (Collision Avoidance)
+      rawAnnotations.sort((a, b) => a.y - b.y);
+      const minGap = isMobile ? 1.4 : 1.1; // 最小百分比間距防重疊
+      for (let i = 1; i < rawAnnotations.length; i++) {
+        if (rawAnnotations[i].y - rawAnnotations[i - 1].y < minGap) {
+          rawAnnotations[i].y = rawAnnotations[i - 1].y + minGap;
+        }
+      }
+
+      layout.annotations = rawAnnotations.map(item => ({
+        x: item.x,
+        y: item.y,
+        xref: 'x',
+        yref: 'y',
+        text: item.text,
+        showarrow: false,
+        xanchor: 'left',
+        xshift: isMobile ? 4 : 8,
+        font: {
+          color: item.color,
+          size: isMobile ? 9.5 : 11
+        }
+      }));
+
+      const config = {
+        responsive: true,
+        displayModeBar: true, // 手機與桌機皆保留右上角控制按鈕
+        displaylogo: false,
+        modeBarButtonsToRemove: ['lasso2d', 'select2d'] // 移除不常用的套索選取，保留縮放、平移、重設
+      };
+
+      Plotly.react('chart', traces, layout, config);
+    }
+
+    function switchMode(mode) {
+      renderView(mode);
+    }
+
+    // 頁面初始化：依 0050 報酬自動載入對應模式
+    window.addEventListener('DOMContentLoaded', () => {
+      renderView(currentMode);
+    });
+
+    // 視窗大小改變時自適應動態重繪 (包含直立/橫向旋轉)
+    window.addEventListener('resize', () => {
+      const b = appData[currentMode];
+      if (b) {
+        renderPlotlyChart(b);
+      }
+    });
+  </script>
+</body>
+</html>
